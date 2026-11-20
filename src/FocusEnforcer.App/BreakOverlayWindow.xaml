@@ -1,0 +1,194 @@
+<Window x:Class="FocusEnforcer.App.BreakOverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Focus Enforcer — Break"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Topmost="True"
+        Background="#000000"
+        Foreground="#FFFFFF"
+        FontFamily="Segoe UI">
+    <Grid Margin="32">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Center: Break countdown & break-complete actions -->
+        <StackPanel Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock x:Name="PhaseTitleText"
+                       Text="BREAK"
+                       FontFamily="Consolas"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="#8E8E93"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,12"/>
+            <TextBlock x:Name="CountdownText"
+                       Text="10:00"
+                       FontFamily="Consolas"
+                       FontSize="84"
+                       FontWeight="Bold"
+                       Foreground="#FFFFFF"
+                       HorizontalAlignment="Center"/>
+            <TextBlock x:Name="SubtitleText"
+                       Text="Step away from the screen."
+                       FontSize="15"
+                       Foreground="#8E8E93"
+                       HorizontalAlignment="Center"
+                       Margin="0,12,0,0"/>
+
+            <StackPanel x:Name="BreakCompleteActions"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        Margin="0,28,0,0"
+                        Visibility="Collapsed">
+                <Button x:Name="StartNextFocusButton"
+                        Content="Start Next Focus"
+                        IsDefault="True"
+                        Height="42"
+                        Padding="22,0"
+                        Margin="0,0,12,0"
+                        FontSize="14"
+                        FontWeight="SemiBold"
+                        Background="#FFFFFF"
+                        Foreground="#000000"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Click="OnStartNextFocusClick">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                <Button Content="Stop (Idle)"
+                        Height="42"
+                        Padding="18,0"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Background="#181818"
+                        Foreground="#8E8E93"
+                        BorderBrush="#262626"
+                        BorderThickness="1"
+                        Cursor="Hand"
+                        Click="OnStopToIdleClick">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="6"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Bottom: Unobtrusive emergency exit trigger & challenge panel -->
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,12">
+            <Border x:Name="EmergencyPanel"
+                    Visibility="Collapsed"
+                    Width="460"
+                    Padding="20"
+                    Margin="0,0,0,16"
+                    Background="#101010"
+                    BorderBrush="#262626"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="EMERGENCY EXIT"
+                               FontFamily="Consolas"
+                               FontSize="11"
+                               FontWeight="Bold"
+                               Foreground="#FF453A"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Type the 24-character phrase below (paste disabled), then hold for 5 seconds:"
+                               FontSize="12"
+                               Foreground="#8E8E93"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,10"/>
+                    <Border Background="#181818" BorderBrush="#262626" BorderThickness="1" CornerRadius="4" Padding="10,8" Margin="0,0,0,10">
+                        <TextBlock x:Name="ChallengePhraseText"
+                                   FontFamily="Consolas"
+                                   FontSize="15"
+                                   FontWeight="Bold"
+                                   Foreground="#FFFFFF"
+                                   HorizontalAlignment="Center"/>
+                    </Border>
+                    <TextBox x:Name="ChallengeInputBox"
+                             Height="34"
+                             Padding="10,6"
+                             Margin="0,0,0,12"
+                             Background="#181818"
+                             Foreground="#FFFFFF"
+                             BorderBrush="#262626"
+                             CaretBrush="#FFFFFF"
+                             FontFamily="Consolas"
+                             FontSize="14"
+                             MaxLength="24"
+                             TextChanged="OnChallengeInputChanged"/>
+                    <Button x:Name="HoldExitButton"
+                            Height="38"
+                            Content="Hold 5s to Exit"
+                            IsEnabled="False"
+                            FontFamily="Consolas"
+                            FontSize="13"
+                            FontWeight="Bold"
+                            Background="#FF453A"
+                            Foreground="#000000"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            PreviewMouseLeftButtonDown="OnHoldStart"
+                            PreviewMouseLeftButtonUp="OnHoldCancel"
+                            MouseLeave="OnHoldLeave">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="Root" Background="{TemplateBinding Background}" CornerRadius="6">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter TargetName="Root" Property="Background" Value="#181818"/>
+                                        <Setter Property="Foreground" Value="#8E8E93"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <Button x:Name="ToggleEmergencyButton"
+                    Height="30"
+                    Padding="14,0"
+                    HorizontalAlignment="Center"
+                    Content="Emergency Exit"
+                    FontSize="12"
+                    Background="#000000"
+                    Foreground="#8E8E93"
+                    BorderBrush="#262626"
+                    BorderThickness="1"
+                    Cursor="Hand"
+                    Click="OnToggleEmergencyClick">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>
