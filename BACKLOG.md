@@ -5,11 +5,11 @@
 - [x] Create project-specific `AGENTS.md` and `UI.md`.
 
 ## P2 — Core MVP (Minimal Scope)
-- [ ] Install .NET 8 SDK (only .NET 8 Runtime currently present) and scaffold C# / WPF (.NET 8) solution under `C:\Entwicklung\focus-enforcer`.
-- [ ] Implement deterministic focus/break state machine (configurable presets e.g. 50/10, 25/5; optional 2-min pre-warning + max 1x +5 min extension) with crash/restart persistence.
-- [ ] Implement compact main control window with optional single-line 2-minute entry-step prompt before session start.
+- [x] Install .NET 8 SDK (only .NET 8 Runtime currently present) and scaffold C# / WPF (.NET 8) solution under `C:\Entwicklung\focus-enforcer`.
+- [x] Implement deterministic focus/break state machine (configurable presets e.g. 50/10, 25/5; optional 2-min pre-warning + max 1x +5 min extension) with crash/restart persistence.
+- [x] Implement compact main control window with optional single-line 2-minute entry-step prompt before session start.
 - [ ] Implement multi-monitor fullscreen break overlay (`HWND_TOPMOST` per monitor + `WH_KEYBOARD_LL` blocking `Alt+Tab`, `Win`, `Alt+F4`).
-- [ ] Implement high-friction emergency exit (random 24-character phrase + 5s hold + audit log).
+- [x] Implement high-friction emergency exit (random 24-character phrase + 5s hold + audit log).
 
 ## P3 — Hardening & Verification
 - [ ] Add automated tests for state machine transitions, extension limits, and persistence.
