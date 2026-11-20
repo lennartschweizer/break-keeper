@@ -1,0 +1,214 @@
+﻿<Window x:Class="FocusEnforcer.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Focus Enforcer"
+        Width="420"
+        Height="510"
+        ResizeMode="CanMinimize"
+        WindowStartupLocation="CenterScreen"
+        Background="#000000"
+        Foreground="#FFFFFF"
+        FontFamily="Segoe UI">
+    <Window.Resources>
+        <Style x:Key="PresetButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Background" Value="#181818"/>
+            <Setter Property="Foreground" Value="#8E8E93"/>
+            <Setter Property="BorderBrush" Value="#262626"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border Margin="16"
+            Padding="24"
+            Background="#101010"
+            BorderBrush="#262626"
+            BorderThickness="1"
+            CornerRadius="10">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="28"/>
+                <RowDefinition Height="92"/>
+                <RowDefinition Height="44"/>
+                <RowDefinition Height="46"/>
+                <RowDefinition Height="64"/>
+                <RowDefinition Height="52"/>
+                <RowDefinition Height="52"/>
+            </Grid.RowDefinitions>
+
+            <!-- Row 0: State badge -->
+            <Border Grid.Row="0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Padding="12,4"
+                    Background="#181818"
+                    BorderBrush="#262626"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                <TextBlock x:Name="StateBadgeText"
+                           Text="IDLE"
+                           FontFamily="Consolas"
+                           FontSize="11"
+                           FontWeight="Bold"
+                           Foreground="#8E8E93"/>
+            </Border>
+
+            <!-- Row 1: Monospace countdown timer -->
+            <TextBlock x:Name="TimerText"
+                       Grid.Row="1"
+                       Text="50:00"
+                       FontFamily="Consolas"
+                       FontSize="58"
+                       FontWeight="Bold"
+                       Foreground="#FFFFFF"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+
+            <!-- Row 2: Preset selector -->
+            <Grid Grid.Row="2" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="Preset50Button" Grid.Column="0" Content="50 / 10" Style="{StaticResource PresetButtonStyle}" Click="OnPreset50Click"/>
+                <Button x:Name="Preset25Button" Grid.Column="2" Content="25 / 5" Style="{StaticResource PresetButtonStyle}" Click="OnPreset25Click"/>
+                <Button x:Name="PresetCustomButton" Grid.Column="4" Content="Custom" Style="{StaticResource PresetButtonStyle}" Click="OnPresetCustomClick"/>
+            </Grid>
+
+            <!-- Row 3: Fixed-height custom duration row (visible only when Custom selected in Idle) -->
+            <Grid x:Name="CustomDurationPanel" Grid.Row="3" VerticalAlignment="Center" Visibility="Hidden">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="64"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="64"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Focus (min)" Foreground="#8E8E93" FontSize="12" VerticalAlignment="Center"/>
+                <TextBox x:Name="CustomFocusBox" Grid.Column="2" Text="45" Height="28" Padding="6,4"
+                         Background="#181818" Foreground="#FFFFFF" BorderBrush="#262626" FontFamily="Consolas"
+                         HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                         TextChanged="OnCustomMinutesChanged"/>
+                <TextBlock Grid.Column="4" Text="Break (min)" Foreground="#8E8E93" FontSize="12" VerticalAlignment="Center"/>
+                <TextBox x:Name="CustomBreakBox" Grid.Column="6" Text="10" Height="28" Padding="6,4"
+                         Background="#181818" Foreground="#FFFFFF" BorderBrush="#262626" FontFamily="Consolas"
+                         HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                         TextChanged="OnCustomMinutesChanged"/>
+            </Grid>
+
+            <!-- Row 4: Fixed-height 2-min entry step -->
+            <Grid Grid.Row="4" VerticalAlignment="Center">
+                <StackPanel x:Name="EntryStepInputPanel">
+                    <TextBlock Text="Next 2-min step (optional)" Foreground="#8E8E93" FontSize="11" Margin="0,0,0,4"/>
+                    <TextBox x:Name="EntryStepBox"
+                             Height="32"
+                             Padding="8,5"
+                             Background="#181818"
+                             Foreground="#FFFFFF"
+                             BorderBrush="#262626"
+                             CaretBrush="#FFFFFF"
+                             FontSize="13"
+                             MaxLength="120"/>
+                </StackPanel>
+                <TextBlock x:Name="ActiveEntryStepText"
+                           Visibility="Hidden"
+                           Foreground="#8E8E93"
+                           FontSize="13"
+                           TextTrimming="CharacterEllipsis"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+            </Grid>
+
+            <!-- Row 5: Primary action button -->
+            <Button x:Name="StartButton"
+                    Grid.Row="5"
+                    Height="40"
+                    VerticalAlignment="Center"
+                    Content="Start Focus"
+                    FontSize="14"
+                    FontWeight="SemiBold"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    Click="OnStartClick">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Setter Property="Foreground" Value="#000000"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="Root" Background="{TemplateBinding Background}" CornerRadius="6">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter TargetName="Root" Property="Background" Value="#181818"/>
+                                            <Setter Property="Foreground" Value="#8E8E93"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+            <!-- Row 6: Fixed-height pre-warning / +5 min extension bar -->
+            <Grid x:Name="PreWarningPanel" Grid.Row="6" VerticalAlignment="Center" Visibility="Hidden">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="PreWarningLabel"
+                           Grid.Column="0"
+                           Text="Break starts soon"
+                           Foreground="#FF9F0A"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+                <Button x:Name="ExtendButton"
+                        Grid.Column="2"
+                        Height="32"
+                        Padding="14,0"
+                        Content="+5 min"
+                        FontFamily="Consolas"
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Background="#FF9F0A"
+                        Foreground="#000000"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Click="OnExtendClick">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
