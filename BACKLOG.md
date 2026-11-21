@@ -16,7 +16,7 @@
 - [x] Verify fullscreen lock behavior on sleep/wake.
 - [x] Rename project and product identity to "Break Enforcer" with a single source of truth for display name, executable, AppData path, and startup task.
 - [x] Stack break-complete action buttons (`Start Next Focus` and `Stop (Idle)`) vertically.
-- [ ] Support full arrow-key navigation with clearly visible focus indicators across all controls (audit every window and control for remaining keyboard-navigation gaps).
+- [x] Support full arrow-key navigation with clearly visible focus indicators across all controls (audit every window and control for remaining keyboard-navigation gaps).
 - [x] Centralize UI design tokens, shared `PhaseBadgeStyle` (`#8E8E93`), and outline-only button styles in `App.xaml`.
 - [x] Restrict custom duration fields to valid numeric values (reject non-numeric, empty, or out-of-range inputs with immediate UI validation) and auto-select all text on focus for immediate replacement.
 - [ ] Simplify Emergency Exit to a single 15s or 30s hold-only button (remove 24-character phrase): label `Emergency Exit (Hold)`, changing while pressed to `Hold (<remaining>s)` with a functional hold-progress animation (requires updating `AGENTS.md` and `UI.md` rule on approval).

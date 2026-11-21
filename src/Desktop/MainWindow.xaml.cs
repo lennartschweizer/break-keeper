@@ -341,7 +341,10 @@ public partial class MainWindow : Window
             if (e.Key is System.Windows.Input.Key.Up or System.Windows.Input.Key.Down or
                 System.Windows.Input.Key.Left or System.Windows.Input.Key.Right)
             {
-                StartButton.Focus();
+                if (StartButton.IsEnabled)
+                    StartButton.Focus();
+                else
+                    CustomFocusBox.Focus();
                 e.Handled = true;
             }
             return;
