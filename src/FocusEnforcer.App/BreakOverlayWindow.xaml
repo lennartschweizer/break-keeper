@@ -114,14 +114,13 @@
                                Foreground="#8E8E93"
                                TextWrapping="Wrap"
                                Margin="0,0,0,10"/>
-                    <Border Background="#181818" BorderBrush="#262626" BorderThickness="1" CornerRadius="4" Padding="10,8" Margin="0,0,0,10">
-                        <TextBlock x:Name="ChallengePhraseText"
-                                   FontFamily="Consolas"
-                                   FontSize="15"
-                                   FontWeight="Bold"
-                                   Foreground="#FFFFFF"
-                                   HorizontalAlignment="Center"/>
-                    </Border>
+                    <TextBlock x:Name="ChallengePhraseText"
+                               FontFamily="Consolas"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               Foreground="#FFFFFF"
+                               HorizontalAlignment="Center"
+                               Margin="0,4,0,12"/>
                     <TextBox x:Name="ChallengeInputBox"
                              Height="34"
                              Padding="10,6"
