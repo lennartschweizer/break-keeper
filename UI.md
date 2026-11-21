@@ -1,4 +1,4 @@
-# Focus Enforcer — Project UI Specification
+# Break Enforcer — Project UI Specification
 
 Inherits all visual tokens, typography, and interaction rules from `~/.gemini/UI.md`.
 

@@ -14,7 +14,7 @@
 ## P3 — Hardening & Verification
 - [x] Add automated tests for state machine transitions, extension limits, and persistence.
 - [x] Verify fullscreen lock behavior on sleep/wake.
-- [ ] Rename project and product identity to "Break Enforcer" with a single source of truth for display name, executable, AppData path, and startup task.
+- [x] Rename project and product identity to "Break Enforcer" with a single source of truth for display name, executable, AppData path, and startup task.
 - [ ] Stack break-complete action buttons (`Start Next Focus` and `Stop (Idle)`) vertically.
 - [ ] Support full arrow-key navigation with clearly visible focus indicators across all controls.
 - [ ] Restrict custom duration fields to valid numeric values and auto-select all text on focus for immediate replacement.
