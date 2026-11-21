@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-namespace FocusEnforcer.Core;
+namespace BreakEnforcer.Core;
 
 public static class EmergencyExitChallenge
 {

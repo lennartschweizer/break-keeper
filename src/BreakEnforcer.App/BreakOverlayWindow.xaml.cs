@@ -5,9 +5,9 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using FocusEnforcer.Core;
+using BreakEnforcer.Core;
 
-namespace FocusEnforcer.App;
+namespace BreakEnforcer.App;
 
 public partial class BreakOverlayWindow : Window
 {

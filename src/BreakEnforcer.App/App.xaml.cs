@@ -1,17 +1,15 @@
 ﻿using System.IO;
 using System.Windows;
 using System.Windows.Interop;
+using BreakEnforcer.Core;
 
-namespace FocusEnforcer.App;
+namespace BreakEnforcer.App;
 
 public partial class App : Application
 {
     protected override void OnStartup(StartupEventArgs e)
     {
-        string logDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "FocusEnforcer");
-        Directory.CreateDirectory(logDir);
+        string logDir = AppIdentity.GetAppDataDirectory();
         string logPath = Path.Combine(logDir, "startup.log");
 
         DispatcherUnhandledException += (_, args) =>

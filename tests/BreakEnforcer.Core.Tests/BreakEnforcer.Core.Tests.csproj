@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\FocusEnforcer.Core\FocusEnforcer.Core.csproj" />
+    <ProjectReference Include="..\..\src\BreakEnforcer.Core\BreakEnforcer.Core.csproj" />
   </ItemGroup>
 
 </Project>

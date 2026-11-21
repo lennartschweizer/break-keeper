@@ -1,6 +1,6 @@
-using FocusEnforcer.Core;
+using BreakEnforcer.Core;
 
-namespace FocusEnforcer.Core.Tests;
+namespace BreakEnforcer.Core.Tests;
 
 public sealed class FocusSessionEngineTests
 {
