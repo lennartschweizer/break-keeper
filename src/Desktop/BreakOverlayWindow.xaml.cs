@@ -209,12 +209,23 @@ public partial class BreakOverlayWindow : Window
 
     private void OnHoldStart(object sender, MouseButtonEventArgs e) => BeginHold();
 
-    private void OnHoldCancel(object sender, MouseButtonEventArgs e) => ResetHold();
+    private void OnHoldCancel(object sender, MouseButtonEventArgs e)
+    {
+        ResetHold();
+        ClearMouseClickFocus();
+    }
 
     private void OnHoldLeave(object sender, MouseEventArgs e)
     {
         if (_holdStopwatch.IsRunning)
             ResetHold();
+        ClearMouseClickFocus();
+    }
+
+    private void ClearMouseClickFocus()
+    {
+        if (EmergencyExitButton.IsKeyboardFocused)
+            Keyboard.ClearFocus();
     }
 
     private void OnHoldButtonPreviewKeyDown(object sender, KeyEventArgs e)
