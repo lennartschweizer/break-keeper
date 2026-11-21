@@ -14,13 +14,14 @@
 ## P3 — Hardening & Verification
 - [x] Add automated tests for state machine transitions, extension limits, and persistence.
 - [x] Verify fullscreen lock behavior on sleep/wake.
-- [x] Rename project and product identity to "Break Enforcer" with a single source of truth for display name, executable, AppData path, and startup task.
+- [x] Rename project and product identity to "Break Keeper" (via "Break Enforcer") with a single source of truth for display name, executable, AppData path, and startup task.
 - [x] Stack break-complete action buttons (`Start Next Focus` and `Stop (Idle)`) vertically.
 - [x] Support full arrow-key navigation with clearly visible focus indicators across all controls (audit every window and control for remaining keyboard-navigation gaps).
 - [x] Centralize UI design tokens, shared `PhaseBadgeStyle` (`#8E8E93`), and outline-only button styles in `App.xaml`.
 - [x] Restrict custom duration fields to valid numeric values (reject non-numeric, empty, or out-of-range inputs with immediate UI validation) and auto-select all text on focus for immediate replacement.
 - [x] Simplify Emergency Exit to a single 15s hold-only button (remove 24-character phrase): label `Emergency Exit (Hold)`, changing while pressed to `Hold (<remaining>s)` without progress animation (`AGENTS.md` and `UI.md` updated).
 - [x] Surface remaining focus time without restoring the window (transparent system tray icon with remaining-time tooltip and click toggle).
+- [x] Hide main window from the taskbar when minimized or toggled to tray.
 - [x] Open Question: Clarify functional progress animations vs. decorative animations in `~/.gemini/UI.md` (`Borderless-Filled` styling adopted; hold-button animation removed so `Zero decorative noise` remains strict).
 
 ## P4 — Release, Monetization, Cross-Device Sync & Deferred Ideas (Out of MVP)

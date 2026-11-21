@@ -62,6 +62,12 @@ public partial class MainWindow : Window
         };
         _timer.Start();
 
+        StateChanged += (_, _) =>
+        {
+            if (WindowState == WindowState.Minimized)
+                HideToTray();
+        };
+
         Closing += (_, e) =>
         {
             if (_engine.Phase == TimerPhase.Break)
@@ -80,15 +86,23 @@ public partial class MainWindow : Window
     private void ToggleWindowFromTray()
     {
         if (WindowState == WindowState.Minimized || !IsVisible)
-        {
-            Show();
-            WindowState = WindowState.Normal;
-            Activate();
-        }
+            RestoreFromTray();
         else
-        {
-            WindowState = WindowState.Minimized;
-        }
+            HideToTray();
+    }
+
+    private void HideToTray()
+    {
+        ShowInTaskbar = false;
+        Hide();
+    }
+
+    private void RestoreFromTray()
+    {
+        ShowInTaskbar = true;
+        Show();
+        WindowState = WindowState.Normal;
+        Activate();
     }
 
     private void SyncPresetSelectionFromEngine()
@@ -183,7 +197,7 @@ public partial class MainWindow : Window
         bool enteredFocus = phase == TimerPhase.Focus && _lastRenderedPhase != TimerPhase.Focus;
         _lastRenderedPhase = phase;
         if (enteredFocus)
-            WindowState = WindowState.Minimized;
+            HideToTray();
     }
 
     private static readonly TimeSpan PreWarningBannerDuration = TimeSpan.FromSeconds(10);
@@ -328,7 +342,7 @@ public partial class MainWindow : Window
 
     private void OnMinimizeClick(object sender, RoutedEventArgs e)
     {
-        WindowState = WindowState.Minimized;
+        HideToTray();
     }
 
     private void OnCloseClick(object sender, RoutedEventArgs e)
