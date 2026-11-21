@@ -35,7 +35,8 @@
                        HorizontalAlignment="Center"/>
 
             <StackPanel x:Name="BreakCompleteActions"
-                        Orientation="Horizontal"
+                        Orientation="Vertical"
+                        Width="220"
                         HorizontalAlignment="Center"
                         Margin="0,28,0,0"
                         Visibility="Collapsed">
@@ -44,7 +45,7 @@
                         IsDefault="True"
                         Height="42"
                         Padding="22,0"
-                        Margin="0,0,12,0"
+                        Margin="0,0,0,10"
                         FontSize="14"
                         FontWeight="SemiBold"
                         Background="#FFFFFF"
