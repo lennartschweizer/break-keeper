@@ -25,6 +25,24 @@ public partial class BreakOverlayWindow : Window
         int cy,
         uint uFlags);
 
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
+    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+    [DllImport("kernel32.dll")]
+    private static extern uint GetCurrentThreadId();
+
+    [DllImport("user32.dll")]
+    private static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
+    [DllImport("user32.dll")]
+    private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    private static extern bool BringWindowToTop(IntPtr hWnd);
+
     private readonly MonitorRect _bounds;
     private readonly string _expectedPhrase;
     private readonly Action<string, bool> _onEmergencyExitAttempt;
@@ -33,6 +51,7 @@ public partial class BreakOverlayWindow : Window
     private readonly DispatcherTimer _holdTimer;
     private readonly Stopwatch _holdStopwatch = new();
     private bool _allowClose;
+    private bool _isBreakCompleted;
 
     public BreakOverlayWindow(
         MonitorRect bounds,
@@ -56,11 +75,20 @@ public partial class BreakOverlayWindow : Window
         _holdTimer.Tick += OnHoldTimerTick;
 
         SourceInitialized += (_, _) => PositionOnTargetMonitor();
+        Loaded += (_, _) =>
+        {
+            if (_isBreakCompleted && _bounds.IsPrimary)
+                BringToForegroundAndFocus();
+        };
+        PreviewKeyDown += OnOverlayPreviewKeyDown;
         Closing += OnWindowClosing;
     }
 
     public void UpdateView(bool isBreakCompleted, TimeSpan remaining)
     {
+        bool enteredBreakCompleted = isBreakCompleted && !_isBreakCompleted;
+        _isBreakCompleted = isBreakCompleted;
+
         if (isBreakCompleted)
         {
             PhaseTitleText.Text = "BREAK COMPLETE";
@@ -71,11 +99,8 @@ public partial class BreakOverlayWindow : Window
             EmergencyPanel.Visibility = Visibility.Collapsed;
             ToggleEmergencyButton.Visibility = Visibility.Collapsed;
             ResetHold();
-            if (_bounds.IsPrimary)
-            {
-                Activate();
-                StartNextFocusButton.Focus();
-            }
+            if (enteredBreakCompleted && _bounds.IsPrimary && IsLoaded)
+                BringToForegroundAndFocus();
             return;
         }
 
@@ -92,6 +117,56 @@ public partial class BreakOverlayWindow : Window
     private void OnStartNextFocusClick(object sender, RoutedEventArgs e) => _onStartNextFocus();
 
     private void OnStopToIdleClick(object sender, RoutedEventArgs e) => _onStopToIdle();
+
+    private void OnOverlayPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (!_isBreakCompleted || e.Key != Key.Enter)
+            return;
+
+        if (Keyboard.FocusedElement is System.Windows.Controls.Button focusedButton &&
+            focusedButton != StartNextFocusButton)
+        {
+            return;
+        }
+
+        e.Handled = true;
+        _onStartNextFocus();
+    }
+
+    private void BringToForegroundAndFocus()
+    {
+        IntPtr hwnd = new WindowInteropHelper(this).Handle;
+        if (hwnd != IntPtr.Zero)
+        {
+            IntPtr foregroundHwnd = GetForegroundWindow();
+            uint currentThread = GetCurrentThreadId();
+            uint foregroundThread = foregroundHwnd != IntPtr.Zero
+                ? GetWindowThreadProcessId(foregroundHwnd, out _)
+                : 0;
+
+            if (foregroundThread != 0 && foregroundThread != currentThread)
+            {
+                AttachThreadInput(foregroundThread, currentThread, true);
+                try
+                {
+                    SetForegroundWindow(hwnd);
+                    BringWindowToTop(hwnd);
+                }
+                finally
+                {
+                    AttachThreadInput(foregroundThread, currentThread, false);
+                }
+            }
+            else
+            {
+                SetForegroundWindow(hwnd);
+                BringWindowToTop(hwnd);
+            }
+        }
+
+        Activate();
+        StartNextFocusButton.Focus();
+    }
 
     public void ForceClose()
     {
