@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\FocusEnforcer.Core\FocusEnforcer.Core.csproj" />
+    <ProjectReference Include="..\BreakEnforcer.Core\BreakEnforcer.Core.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

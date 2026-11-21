@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace FocusEnforcer.Core;
+namespace BreakEnforcer.Core;
 
 public interface ISessionStore
 {

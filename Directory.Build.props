@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <Product>Break Enforcer</Product>
+    <AppId>BreakEnforcer</AppId>
+  </PropertyGroup>
+</Project>

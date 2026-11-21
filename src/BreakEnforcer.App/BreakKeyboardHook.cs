@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using FocusEnforcer.Core;
+using BreakEnforcer.Core;
 
-namespace FocusEnforcer.App;
+namespace BreakEnforcer.App;
 
 public sealed class BreakKeyboardHook : IDisposable
 {

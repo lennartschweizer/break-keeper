@@ -1,6 +1,6 @@
-using FocusEnforcer.Core;
+using BreakEnforcer.Core;
 
-namespace FocusEnforcer.App;
+namespace BreakEnforcer.App;
 
 public sealed class BreakOverlayCoordinator : IDisposable
 {
