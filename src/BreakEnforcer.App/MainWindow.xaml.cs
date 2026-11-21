@@ -1,12 +1,12 @@
-﻿using System.IO;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
-using FocusEnforcer.Core;
+using BreakEnforcer.Core;
 
-namespace FocusEnforcer.App;
+namespace BreakEnforcer.App;
 
 public partial class MainWindow : Window
 {
@@ -31,9 +31,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         SourceInitialized += (_, _) => ApplyRoundedWindowCorners();
 
-        string appDataDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "FocusEnforcer");
+        string appDataDir = AppIdentity.GetAppDataDirectory();
         var store = new JsonSessionStore(Path.Combine(appDataDir, "session.json"));
         var auditLog = new FileAuditLog(Path.Combine(appDataDir, "audit.log"));
 
