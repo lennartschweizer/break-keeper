@@ -6,15 +6,21 @@ $ErrorActionPreference = "Stop"
 
 $runKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
 $entryName = "FocusEnforcer"
+$taskName = "FocusEnforcer"
 $root = Split-Path -Parent $PSScriptRoot
 $exePath = Join-Path $root "out\release\FocusEnforcer.App.exe"
 
+if (Get-ItemProperty -Path $runKey -Name $entryName -ErrorAction SilentlyContinue) {
+    Remove-ItemProperty -Path $runKey -Name $entryName
+}
+
 if ($Disable) {
-    if (Get-ItemProperty -Path $runKey -Name $entryName -ErrorAction SilentlyContinue) {
-        Remove-ItemProperty -Path $runKey -Name $entryName
-        Write-Output "Removed $entryName from Windows startup."
+    $existingTask = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
+    if ($existingTask) {
+        Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
+        Write-Output "Removed $taskName from Windows startup."
     } else {
-        Write-Output "$entryName is not registered in Windows startup."
+        Write-Output "$taskName is not registered in Windows startup."
     }
     exit 0
 }
@@ -23,12 +29,29 @@ if (-not (Test-Path $exePath)) {
     throw "Release executable not found at $exePath"
 }
 
-$quotedCommand = "`"$exePath`""
-Set-ItemProperty -Path $runKey -Name $entryName -Value $quotedCommand -Type String
+$currentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+$action = New-ScheduledTaskAction -Execute $exePath -WorkingDirectory (Split-Path -Parent $exePath)
+$trigger = New-ScheduledTaskTrigger -AtLogOn -User $currentUser
+$settings = New-ScheduledTaskSettingsSet `
+    -AllowStartIfOnBatteries `
+    -DontStopIfGoingOnBatteries `
+    -StartWhenAvailable `
+    -ExecutionTimeLimit ([TimeSpan]::Zero) `
+    -MultipleInstances IgnoreNew
+$principal = New-ScheduledTaskPrincipal -UserId $currentUser -LogonType Interactive -RunLevel Limited
 
-$actual = (Get-ItemProperty -Path $runKey -Name $entryName).$entryName
-if ($actual -ne $quotedCommand) {
-    throw "Registry verification failed: expected $quotedCommand, got $actual"
+Register-ScheduledTask `
+    -TaskName $taskName `
+    -Action $action `
+    -Trigger $trigger `
+    -Settings $settings `
+    -Principal $principal `
+    -Force | Out-Null
+
+$registered = Get-ScheduledTask -TaskName $taskName -ErrorAction Stop
+$registeredAction = ($registered.Actions | Select-Object -First 1).Execute
+if ($registeredAction -ne $exePath) {
+    throw "Scheduled task verification failed: expected $exePath, got $registeredAction"
 }
 
-Write-Output "Registered $entryName in Windows startup: $actual"
+Write-Output "Registered $taskName scheduled logon task: $registeredAction"
