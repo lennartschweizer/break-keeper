@@ -1,5 +1,7 @@
 ﻿using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 using FocusEnforcer.Core;
@@ -14,9 +16,6 @@ public partial class MainWindow : Window
     private static readonly SolidColorBrush BlackBrush = Freeze(Color.FromRgb(0x00, 0x00, 0x00));
     private static readonly SolidColorBrush SurfaceElevatedBrush = Freeze(Color.FromRgb(0x18, 0x18, 0x18));
     private static readonly SolidColorBrush SecondaryTextBrush = Freeze(Color.FromRgb(0x8E, 0x8E, 0x93));
-    private static readonly SolidColorBrush FocusAccentBrush = Freeze(Color.FromRgb(0x30, 0xD1, 0x58));
-    private static readonly SolidColorBrush WarningAccentBrush = Freeze(Color.FromRgb(0xFF, 0x9F, 0x0A));
-    private static readonly SolidColorBrush ErrorAccentBrush = Freeze(Color.FromRgb(0xFF, 0x45, 0x3A));
 
     private readonly FocusSessionEngine _engine;
     private readonly BreakOverlayCoordinator _overlayCoordinator = new();
@@ -24,11 +23,13 @@ public partial class MainWindow : Window
     private PresetKind _selectedPreset = PresetKind.Deep50;
     private TimerPhase? _lastRenderedPhase;
     private PreWarningBannerWindow? _preWarningBanner;
-    private bool _bannerDismissed;
+    private bool _preWarningNotificationConsumed;
+    private DateTimeOffset _preWarningShownAtUtc;
 
     public MainWindow()
     {
         InitializeComponent();
+        SourceInitialized += (_, _) => ApplyRoundedWindowCorners();
 
         string appDataDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -112,34 +113,30 @@ public partial class MainWindow : Window
         TimeSpan displayed = isIdle ? BuildSelectedPreset().FocusDuration : _engine.Remaining;
         TimerText.Text = FormatTimeSpan(displayed);
 
-        (StateBadgeText.Text, StateBadgeText.Foreground) = phase switch
+        StateBadgeText.Text = phase switch
         {
-            TimerPhase.Idle => ("IDLE", SecondaryTextBrush),
-            TimerPhase.Focus => ("FOCUS", FocusAccentBrush),
-            TimerPhase.PreWarning => ("PRE-WARNING", WarningAccentBrush),
-            TimerPhase.Break => ("BREAK", ErrorAccentBrush),
-            TimerPhase.BreakCompleted => ("BREAK COMPLETE", FocusAccentBrush),
-            _ => ("IDLE", SecondaryTextBrush)
+            TimerPhase.Idle => "IDLE",
+            TimerPhase.Focus or TimerPhase.PreWarning => "FOCUS",
+            TimerPhase.Break => "BREAK",
+            TimerPhase.BreakCompleted => "BREAK COMPLETE",
+            _ => "IDLE"
         };
+        StateBadgeText.Foreground = SecondaryTextBrush;
 
+        PresetSelectorPanel.Visibility = isIdle ? Visibility.Visible : Visibility.Collapsed;
         UpdatePresetButton(Preset50Button, _selectedPreset == PresetKind.Deep50, isIdle);
         UpdatePresetButton(Preset25Button, _selectedPreset == PresetKind.Starter25, isIdle);
         UpdatePresetButton(PresetCustomButton, _selectedPreset == PresetKind.Custom, isIdle);
 
         CustomDurationPanel.Visibility = isIdle && _selectedPreset == PresetKind.Custom
             ? Visibility.Visible
-            : Visibility.Hidden;
+            : Visibility.Collapsed;
 
         StartButton.IsEnabled = isIdle;
-        StartButton.Content = phase switch
-        {
-            TimerPhase.Idle => "Start Focus",
-            TimerPhase.Break => "Break Active",
-            _ => "Focus Active"
-        };
+        StartButton.Visibility = isIdle ? Visibility.Visible : Visibility.Collapsed;
 
         bool showPreWarning = phase == TimerPhase.PreWarning;
-        PreWarningPanel.Visibility = showPreWarning ? Visibility.Visible : Visibility.Hidden;
+        ExtendButton.Visibility = showPreWarning ? Visibility.Visible : Visibility.Collapsed;
         ExtendButton.IsEnabled = _engine.CanExtend;
 
         _overlayCoordinator.SyncWithEngine(_engine, RenderState);
@@ -151,37 +148,41 @@ public partial class MainWindow : Window
             WindowState = WindowState.Minimized;
     }
 
+    private static readonly TimeSpan PreWarningBannerDuration = TimeSpan.FromSeconds(10);
+
     private void SyncPreWarningBanner(TimerPhase phase, TimeSpan remaining)
     {
         if (phase != TimerPhase.PreWarning)
         {
-            _bannerDismissed = false;
+            _preWarningNotificationConsumed = false;
             ClosePreWarningBanner();
             return;
         }
 
-        if (_bannerDismissed)
+        if (!_preWarningNotificationConsumed)
         {
-            ClosePreWarningBanner();
-            return;
-        }
-
-        if (_preWarningBanner is null)
-        {
+            _preWarningNotificationConsumed = true;
+            _preWarningShownAtUtc = DateTimeOffset.UtcNow;
             _preWarningBanner = new PreWarningBannerWindow(
                 onExtend: () =>
                 {
                     _engine.TryExtendFocus();
                     RenderState();
                 },
-                onDismiss: () =>
-                {
-                    _bannerDismissed = true;
-                    ClosePreWarningBanner();
-                });
+                onDismiss: ClosePreWarningBanner);
         }
 
-        _preWarningBanner.UpdateState(FormatTimeSpan(remaining), _engine.CanExtend);
+        if (_preWarningBanner is null)
+            return;
+
+        if (DateTimeOffset.UtcNow - _preWarningShownAtUtc >= PreWarningBannerDuration)
+        {
+            ClosePreWarningBanner();
+            return;
+        }
+
+        int minutesRemaining = (int)Math.Ceiling(remaining.TotalMinutes);
+        _preWarningBanner.UpdateState(minutesRemaining, _engine.CanExtend);
         if (!_preWarningBanner.IsVisible)
             _preWarningBanner.Show();
     }
@@ -191,8 +192,9 @@ public partial class MainWindow : Window
         if (_preWarningBanner is null)
             return;
 
-        _preWarningBanner.Close();
+        PreWarningBannerWindow banner = _preWarningBanner;
         _preWarningBanner = null;
+        banner.FadeOutAndClose();
     }
 
     private static void UpdatePresetButton(System.Windows.Controls.Button button, bool isSelected, bool isEnabled)
@@ -257,4 +259,18 @@ public partial class MainWindow : Window
     {
         Close();
     }
+
+    private void ApplyRoundedWindowCorners()
+    {
+        IntPtr hwnd = new WindowInteropHelper(this).Handle;
+        if (hwnd == IntPtr.Zero)
+            return;
+
+        const int dwmwaWindowCornerPreference = 33;
+        int preference = 2; // DWMWCP_ROUND
+        _ = DwmSetWindowAttribute(hwnd, dwmwaWindowCornerPreference, ref preference, sizeof(int));
+    }
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
 }
