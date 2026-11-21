@@ -7,3 +7,4 @@ Enforce break locks across all monitors via topmost overlays and low-level keybo
 Restrict emergency break exits to a 24-character challenge plus a 5-second hold.
 Append every emergency break exit to an audit log.
 Exclude Cold Turkey Blocker CLI automation from the MVP.
+Publish release builds with ReadyToRun and register login autostart via a zero-delay Scheduled Task.

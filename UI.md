@@ -4,11 +4,11 @@ Inherits all visual tokens, typography, and interaction rules from `~/.gemini/UI
 
 ## Main Control Window
 
-- Compact single-view layout (`#101010` surface on `#000000` background) with fixed dimensions to prevent layout shift.
+- Compact single-view layout directly on `#000000` background (no outer card or bounding box; `#101010`/`#181818` reserved for controls and inputs) with fixed dimensions to prevent layout shift.
 - Centered monospace countdown timer (`#FFFFFF`) above a single state badge (`#30D158` active focus, `#FF9F0A` pre-warning, `#8E8E93` idle).
 - Preset selector (`50/10`, `25/5`, custom) with inverted active state (`#FFFFFF` fill, `#000000` text).
-- Optional single-line entry-step input (`Next 2-min step`) visible in `Idle` state to lower task-initiation friction.
 - Pre-warning state (2 minutes before break) surfaces a single `+5 min` extension control (`#FF9F0A`), disabled after one use per cycle.
+- Non-activating bottom-right pre-warning banner (`#000000` surface, `#262626` border) surfaces the `BREAK IN` countdown, `+5 min` extension, and dismiss control without stealing focus.
 
 ## Fullscreen Break Overlay
 
