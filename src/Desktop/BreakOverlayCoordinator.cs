@@ -27,16 +27,14 @@ public sealed class BreakOverlayCoordinator : IDisposable
 
         if (_overlays.Count == 0)
         {
-            string phrase = engine.EmergencyExitPhrase ?? string.Empty;
             IReadOnlyList<MonitorRect> monitors = MonitorBoundsProvider.GetMonitors();
             foreach (MonitorRect monitor in monitors)
             {
                 var overlay = new BreakOverlayWindow(
                     monitor,
-                    phrase,
-                    (typedPhrase, holdCompleted) =>
+                    holdCompleted =>
                     {
-                        if (engine.TryEmergencyExitBreak(typedPhrase, holdCompleted))
+                        if (engine.TryEmergencyExitBreak(holdCompleted))
                         {
                             CloseAll();
                             onStateChanged();

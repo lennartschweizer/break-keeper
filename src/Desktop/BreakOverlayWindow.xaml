@@ -24,11 +24,8 @@
                        Margin="0,0,0,12"/>
             <TextBlock x:Name="CountdownText"
                        Text="10:00"
-                       FontFamily="{StaticResource FontMono}"
                        FontSize="84"
-                       FontWeight="Bold"
-                       Foreground="{StaticResource TextPrimaryBrush}"
-                       HorizontalAlignment="Center"/>
+                       Style="{StaticResource TimerDisplayStyle}"/>
 
             <StackPanel x:Name="BreakCompleteActions"
                         Orientation="Vertical"
@@ -55,86 +52,22 @@
             </StackPanel>
         </StackPanel>
 
-        <!-- Bottom: Unobtrusive emergency exit trigger & challenge panel -->
-        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,12">
-            <Border x:Name="EmergencyPanel"
-                    Visibility="Collapsed"
-                    Width="460"
-                    Padding="20"
-                    Margin="0,0,0,16"
-                    Background="{StaticResource SurfaceElevatedBrush}"
-                    CornerRadius="8">
-                <StackPanel>
-                    <TextBlock Text="EMERGENCY EXIT"
-                               FontFamily="Consolas"
-                               FontSize="11"
-                               FontWeight="Bold"
-                               Foreground="#FF453A"
-                               Margin="0,0,0,8"/>
-                    <TextBlock Text="Type the 24-character phrase below (paste disabled), then hold for 5 seconds:"
-                               FontSize="12"
-                               Foreground="#8E8E93"
-                               TextWrapping="Wrap"
-                               Margin="0,0,0,10"/>
-                    <TextBlock x:Name="ChallengePhraseText"
-                               FontFamily="Consolas"
-                               FontSize="15"
-                               FontWeight="Bold"
-                               Foreground="#FFFFFF"
-                               HorizontalAlignment="Center"
-                               Margin="0,4,0,12"/>
-                    <TextBox x:Name="ChallengeInputBox"
-                             Height="34"
-                             Margin="0,0,0,12"
-                             Background="{StaticResource SurfaceInteractiveBrush}"
-                             FontSize="14"
-                             HorizontalContentAlignment="Left"
-                             Style="{StaticResource NumericInputStyle}"
-                             MaxLength="24"
-                             TextChanged="OnChallengeInputChanged"/>
-                    <Button x:Name="HoldExitButton"
-                            Height="38"
-                            Content="Hold 5s to Exit"
-                            IsEnabled="False"
-                            FontFamily="Consolas"
-                            FontSize="13"
-                            FontWeight="Bold"
-                            Background="#FF453A"
-                            Foreground="#000000"
-                            BorderThickness="0"
-                            FocusVisualStyle="{x:Null}"
-                            Cursor="Hand"
-                            PreviewMouseLeftButtonDown="OnHoldStart"
-                            PreviewMouseLeftButtonUp="OnHoldCancel"
-                            MouseLeave="OnHoldLeave">
-                        <Button.Template>
-                            <ControlTemplate TargetType="Button">
-                                <Border x:Name="Root" Background="{TemplateBinding Background}" CornerRadius="6">
-                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsKeyboardFocused" Value="True">
-                                        <Setter TargetName="Root" Property="Background" Value="#FF6961"/>
-                                    </Trigger>
-                                    <Trigger Property="IsEnabled" Value="False">
-                                        <Setter TargetName="Root" Property="Background" Value="#181818"/>
-                                        <Setter Property="Foreground" Value="#8E8E93"/>
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Button.Template>
-                    </Button>
-                </StackPanel>
-            </Border>
-
-            <Button x:Name="ToggleEmergencyButton"
-                    Height="32"
-                    Padding="14,0"
-                    HorizontalAlignment="Center"
-                    Content="Emergency Exit"
-                    FontSize="12"
-                    Style="{StaticResource FilledButtonStyle}"
-                    Click="OnToggleEmergencyClick"/>
-        </StackPanel>
+        <!-- Bottom: Single 15s hold-only emergency exit control -->
+        <Button x:Name="EmergencyExitButton"
+                Grid.Row="1"
+                Width="220"
+                Height="36"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Margin="0,0,0,12"
+                Content="Emergency Exit (Hold)"
+                FontSize="12"
+                Style="{StaticResource FilledButtonStyle}"
+                PreviewMouseLeftButtonDown="OnHoldStart"
+                PreviewMouseLeftButtonUp="OnHoldCancel"
+                MouseLeave="OnHoldLeave"
+                PreviewKeyDown="OnHoldButtonPreviewKeyDown"
+                PreviewKeyUp="OnHoldButtonPreviewKeyUp"
+                LostKeyboardFocus="OnHoldButtonLostFocus"/>
     </Grid>
 </Window>

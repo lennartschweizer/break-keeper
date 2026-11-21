@@ -50,13 +50,10 @@ public sealed class FocusSessionEngineTests
             Assert.True(engine.Tick());
             Assert.Equal(TimerPhase.Break, engine.Phase);
             Assert.Equal(TimeSpan.FromMinutes(10), engine.Remaining);
-            Assert.NotNull(engine.EmergencyExitPhrase);
-            Assert.Equal(EmergencyExitChallenge.PhraseLength, engine.EmergencyExitPhrase!.Length);
 
             time.Advance(TimeSpan.FromMinutes(10));
             Assert.True(engine.Tick());
             Assert.Equal(TimerPhase.BreakCompleted, engine.Phase);
-            Assert.Null(engine.EmergencyExitPhrase);
             Assert.Null(engine.EntryStep);
 
             engine.StartNextFocus();
@@ -96,7 +93,7 @@ public sealed class FocusSessionEngineTests
     }
 
     [Fact]
-    public void TryEmergencyExitBreak_RequiresExact24CharPhraseAndHold_AndLogsAudit()
+    public void TryEmergencyExitBreak_RequiresHoldCompletion_AndLogsAudit()
     {
         var (engine, time, _, audit, tempDir) = CreateHarness();
         try
@@ -105,15 +102,13 @@ public sealed class FocusSessionEngineTests
             time.Advance(TimeSpan.FromMinutes(25));
             engine.Tick();
             Assert.Equal(TimerPhase.Break, engine.Phase);
-            string phrase = engine.EmergencyExitPhrase!;
 
-            Assert.False(engine.TryEmergencyExitBreak(phrase, holdCompleted: false));
-            Assert.False(engine.TryEmergencyExitBreak("WRONG", holdCompleted: true));
+            Assert.False(engine.TryEmergencyExitBreak(holdCompleted: false));
             Assert.Equal(TimerPhase.Break, engine.Phase);
             Assert.Empty(audit.Entries);
 
             time.Advance(TimeSpan.FromMinutes(1));
-            Assert.True(engine.TryEmergencyExitBreak(phrase, holdCompleted: true));
+            Assert.True(engine.TryEmergencyExitBreak(holdCompleted: true));
             Assert.Equal(TimerPhase.Idle, engine.Phase);
             Assert.Single(audit.Entries);
             Assert.Equal("25/5", audit.Entries[0].PresetName);
@@ -134,7 +129,6 @@ public sealed class FocusSessionEngineTests
             engine1.StartFocus(TimerPreset.Starter25, "Open PDF");
             time.Advance(TimeSpan.FromMinutes(25));
             engine1.Tick();
-            string phrase = engine1.EmergencyExitPhrase!;
 
             time.Advance(TimeSpan.FromMinutes(2));
             var engine2 = new FocusSessionEngine(time, store, audit);
@@ -142,7 +136,6 @@ public sealed class FocusSessionEngineTests
 
             Assert.Equal(TimerPhase.Break, engine2.Phase);
             Assert.Equal(TimeSpan.FromMinutes(3), engine2.Remaining);
-            Assert.Equal(phrase, engine2.EmergencyExitPhrase);
 
             time.Advance(TimeSpan.FromMinutes(5));
             var engine3 = new FocusSessionEngine(time, store, audit);

@@ -18,7 +18,6 @@ public sealed class FocusSessionEngine
     public string? EntryStep { get; private set; }
     public DateTimeOffset? PhaseEndUtc { get; private set; }
     public int ExtensionsUsed { get; private set; }
-    public string? EmergencyExitPhrase { get; private set; }
 
     public TimeSpan Remaining
     {
@@ -49,7 +48,6 @@ public sealed class FocusSessionEngine
         EntryStep = string.IsNullOrWhiteSpace(entryStep) ? null : entryStep.Trim();
         PhaseEndUtc = now + preset.FocusDuration;
         ExtensionsUsed = 0;
-        EmergencyExitPhrase = null;
         Phase = preset.PreWarningDuration > TimeSpan.Zero && preset.FocusDuration <= preset.PreWarningDuration
             ? TimerPhase.PreWarning
             : TimerPhase.Focus;
@@ -78,7 +76,6 @@ public sealed class FocusSessionEngine
                 {
                     Phase = TimerPhase.Break;
                     PhaseEndUtc = breakEnd;
-                    EmergencyExitPhrase = EmergencyExitChallenge.GeneratePhrase();
                 }
                 Persist();
                 return true;
@@ -122,12 +119,9 @@ public sealed class FocusSessionEngine
         return true;
     }
 
-    public bool TryEmergencyExitBreak(string? typedPhrase, bool holdCompleted)
+    public bool TryEmergencyExitBreak(bool holdCompleted)
     {
         if (Phase != TimerPhase.Break || !holdCompleted)
-            return false;
-
-        if (!EmergencyExitChallenge.Matches(EmergencyExitPhrase, typedPhrase))
             return false;
 
         DateTimeOffset now = _timeProvider.GetUtcNow();
@@ -148,7 +142,6 @@ public sealed class FocusSessionEngine
         EntryStep = null;
         PhaseEndUtc = now + ActivePreset.FocusDuration;
         ExtensionsUsed = 0;
-        EmergencyExitPhrase = null;
         Phase = ActivePreset.PreWarningDuration > TimeSpan.Zero && ActivePreset.FocusDuration <= ActivePreset.PreWarningDuration
             ? TimerPhase.PreWarning
             : TimerPhase.Focus;
@@ -178,7 +171,6 @@ public sealed class FocusSessionEngine
         EntryStep = snapshot.EntryStep;
         PhaseEndUtc = snapshot.PhaseEndUtc;
         ExtensionsUsed = snapshot.ExtensionsUsed;
-        EmergencyExitPhrase = snapshot.EmergencyExitPhrase;
         Phase = snapshot.Phase;
 
         Tick();
@@ -190,7 +182,6 @@ public sealed class FocusSessionEngine
         EntryStep = null;
         PhaseEndUtc = null;
         ExtensionsUsed = 0;
-        EmergencyExitPhrase = null;
     }
 
     private void ResetToIdle()
@@ -199,7 +190,6 @@ public sealed class FocusSessionEngine
         EntryStep = null;
         PhaseEndUtc = null;
         ExtensionsUsed = 0;
-        EmergencyExitPhrase = null;
     }
 
     private void Persist()
@@ -209,7 +199,6 @@ public sealed class FocusSessionEngine
             ActivePreset,
             EntryStep,
             PhaseEndUtc,
-            ExtensionsUsed,
-            EmergencyExitPhrase));
+            ExtensionsUsed));
     }
 }
