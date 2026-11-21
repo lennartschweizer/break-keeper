@@ -32,12 +32,6 @@
                        FontWeight="Bold"
                        Foreground="#FFFFFF"
                        HorizontalAlignment="Center"/>
-            <TextBlock x:Name="SubtitleText"
-                       Text="Step away from the screen."
-                       FontSize="15"
-                       Foreground="#8E8E93"
-                       HorizontalAlignment="Center"
-                       Margin="0,12,0,0"/>
 
             <StackPanel x:Name="BreakCompleteActions"
                         Orientation="Horizontal"
