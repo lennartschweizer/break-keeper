@@ -12,6 +12,7 @@ public partial class MainWindow : Window
     private readonly FocusSessionEngine _engine;
     private readonly JsonDurationPreferencesStore _preferencesStore;
     private readonly BreakOverlayCoordinator _overlayCoordinator = new();
+    private readonly TrayIconController _trayIcon;
     private readonly DispatcherTimer _timer;
     private bool _isSyncingInputs;
     private TimerPhase? _lastRenderedPhase;
@@ -51,6 +52,7 @@ public partial class MainWindow : Window
         _engine = new FocusSessionEngine(TimeProvider.System, store, auditLog);
         _engine.RestoreFromStore();
         SyncPresetSelectionFromEngine();
+        _trayIcon = new TrayIconController(ToggleWindowFromTray);
 
         _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
         _timer.Tick += (_, _) =>
@@ -69,9 +71,24 @@ public partial class MainWindow : Window
             }
             _overlayCoordinator.CloseAll();
             ClosePreWarningBanner();
+            _trayIcon.Dispose();
         };
 
         RenderState();
+    }
+
+    private void ToggleWindowFromTray()
+    {
+        if (WindowState == WindowState.Minimized || !IsVisible)
+        {
+            Show();
+            WindowState = WindowState.Normal;
+            Activate();
+        }
+        else
+        {
+            WindowState = WindowState.Minimized;
+        }
     }
 
     private void SyncPresetSelectionFromEngine()
@@ -161,6 +178,7 @@ public partial class MainWindow : Window
 
         _overlayCoordinator.SyncWithEngine(_engine, RenderState);
         SyncPreWarningBanner(phase, displayed);
+        _trayIcon.Update(phase, displayed);
 
         bool enteredFocus = phase == TimerPhase.Focus && _lastRenderedPhase != TimerPhase.Focus;
         _lastRenderedPhase = phase;

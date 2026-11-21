@@ -10,6 +10,7 @@ Inherits all visual tokens, typography, and interaction rules from `~/.gemini/UI
 - Borderless filled action and preset buttons (`#101010`/`#181818` resting fill, `#262626` focus fill, `#C7C7CC` fill with `#000000` text for active selection, `#FFFFFF` fill when active selection is focused; primary actions use `#FFFFFF` text, secondary actions `#8E8E93` until hovered or focused).
 - Pre-warning state (2 minutes before break) surfaces a single monochrome `+5 min` filled control, disabled after one use per cycle.
 - Non-activating bottom-right pre-warning banner (`#101010` surface without border) surfaces a white `Break in 2 min` notice, filled `+5 min` extension, and dismiss control for 10 seconds with a subtle fade-in/fade-out and no focus steal.
+- System tray icon displays remaining focus time in its tooltip and toggles the main window on left-click.
 
 ## Fullscreen Break Overlay
 
