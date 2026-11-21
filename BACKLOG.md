@@ -25,9 +25,10 @@
 - [x] Open Question: Clarify functional progress animations vs. decorative animations in `~/.gemini/UI.md` (`Borderless-Filled` styling adopted; hold-button animation removed so `Zero decorative noise` remains strict).
 
 ## P4 — Release, Monetization, Cross-Device Sync & Deferred Ideas (Out of MVP)
-- [ ] Release & Freemium monetization: maximize revenue via freemium model (e.g., fixed focus/break presets free, custom focus/break durations paid via lifetime unlock or similar).
+- [ ] Free public Windows release (Phase 1 — GitHub Releases): package Release build archive with README usage/SmartScreen notes.
+- [ ] Enable NuGetAudit in build configuration and add GitHub Dependabot/CodeQL security workflows.
+- [ ] Free public Windows release (Phase 2 — Microsoft Store): package as MSIX with manifest startup task and submit via free individual developer account.
+- [ ] Freemium monetization tied to future Pro features (e.g., cross-device sync, scheduling, call detection) rather than paywalling existing timer inputs.
 - [ ] User-created custom presets (or minimal alternative: persist last-used focus/break durations across restarts without preset-management UI bloat).
-- [ ] Cross-app product philosophy — user freedom & customizability: give users maximum freedom to customize settings and workflows across all apps.
-- [ ] Cross-app monetization & transparent suffering-reduction pledge: transparently donate a share of revenue to highly effective suffering-reduction organizations and present it as a selling point if it increases total user spend (maximizing total spend toward personal revenue + effective suffering-reduction impact).
 - [ ] Companion Android (and optionally iOS) app with automatic cross-device sync so tablet and PC enter break mode simultaneously.
 - [x] Maintain permanent Cold Turkey `.txt` blacklist gaps (Mediatheken e.g. ZDF, Higgsfield AI short films, DAZN, UEFA) for PC and compatible mobile blocker.
