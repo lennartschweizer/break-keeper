@@ -25,7 +25,7 @@
 - [x] Open Question: Clarify functional progress animations vs. decorative animations in `~/.gemini/UI.md` (`Borderless-Filled` styling adopted; hold-button animation removed so `Zero decorative noise` remains strict).
 
 ## P4 — Release, Monetization, Cross-Device Sync & Deferred Ideas (Out of MVP)
-- [ ] Free public Windows release (Phase 1 — GitHub Releases): package Release build archive with README usage/SmartScreen notes.
+- [x] Free public Windows release (Phase 1 — GitHub Releases): package Release build archive with README usage/SmartScreen notes. (`v1.0.0`, `3ffbbbc`)
 - [ ] Enable NuGetAudit in build configuration and add GitHub Dependabot/CodeQL security workflows.
 - [ ] Free public Windows release (Phase 2 — Microsoft Store): package as MSIX with manifest startup task and submit via free individual developer account.
 - [ ] Freemium monetization tied to future Pro features (e.g., cross-device sync, scheduling, call detection) rather than paywalling existing timer inputs.
