@@ -144,19 +144,38 @@ public partial class BreakOverlayWindow : Window
 
         if (EmergencyPanel.Visibility == Visibility.Visible)
         {
-            if (e.Key == Key.Down && Keyboard.FocusedElement == ChallengeInputBox)
+            IInputElement? focused = Keyboard.FocusedElement;
+            if (e.Key == Key.Down)
             {
-                if (HoldExitButton.IsEnabled)
-                    HoldExitButton.Focus();
-                else
+                if (focused == ChallengeInputBox)
+                {
+                    if (HoldExitButton.IsEnabled)
+                        HoldExitButton.Focus();
+                    else
+                        ToggleEmergencyButton.Focus();
+                    e.Handled = true;
+                }
+                else if (focused == HoldExitButton)
+                {
                     ToggleEmergencyButton.Focus();
-                e.Handled = true;
+                    e.Handled = true;
+                }
             }
-            else if (e.Key == Key.Up && Keyboard.FocusedElement != ChallengeInputBox)
+            else if (e.Key == Key.Up)
             {
-                ChallengeInputBox.Focus();
+                if (focused == ToggleEmergencyButton && HoldExitButton.IsEnabled)
+                    HoldExitButton.Focus();
+                else if (focused != ChallengeInputBox)
+                    ChallengeInputBox.Focus();
                 e.Handled = true;
             }
+            return;
+        }
+
+        if (e.Key is Key.Up or Key.Down or Key.Left or Key.Right)
+        {
+            ToggleEmergencyButton.Focus();
+            e.Handled = true;
         }
     }
 

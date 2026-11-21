@@ -102,6 +102,7 @@
                             Background="#FF453A"
                             Foreground="#000000"
                             BorderThickness="0"
+                            FocusVisualStyle="{x:Null}"
                             Cursor="Hand"
                             PreviewMouseLeftButtonDown="OnHoldStart"
                             PreviewMouseLeftButtonUp="OnHoldCancel"
@@ -112,6 +113,9 @@
                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <ControlTemplate.Triggers>
+                                    <Trigger Property="IsKeyboardFocused" Value="True">
+                                        <Setter TargetName="Root" Property="Background" Value="#FF6961"/>
+                                    </Trigger>
                                     <Trigger Property="IsEnabled" Value="False">
                                         <Setter TargetName="Root" Property="Background" Value="#181818"/>
                                         <Setter Property="Foreground" Value="#8E8E93"/>
