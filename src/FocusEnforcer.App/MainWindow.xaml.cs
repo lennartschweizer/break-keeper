@@ -22,6 +22,9 @@ public partial class MainWindow : Window
     private readonly BreakOverlayCoordinator _overlayCoordinator = new();
     private readonly DispatcherTimer _timer;
     private PresetKind _selectedPreset = PresetKind.Deep50;
+    private TimerPhase? _lastRenderedPhase;
+    private PreWarningBannerWindow? _preWarningBanner;
+    private bool _bannerDismissed;
 
     public MainWindow()
     {
@@ -53,6 +56,7 @@ public partial class MainWindow : Window
                 return;
             }
             _overlayCoordinator.CloseAll();
+            ClosePreWarningBanner();
         };
 
         RenderState();
@@ -126,12 +130,6 @@ public partial class MainWindow : Window
             ? Visibility.Visible
             : Visibility.Hidden;
 
-        EntryStepInputPanel.Visibility = isIdle ? Visibility.Visible : Visibility.Hidden;
-        ActiveEntryStepText.Visibility = !isIdle && !string.IsNullOrWhiteSpace(_engine.EntryStep)
-            ? Visibility.Visible
-            : Visibility.Hidden;
-        ActiveEntryStepText.Text = _engine.EntryStep is null ? string.Empty : $"Step: {_engine.EntryStep}";
-
         StartButton.IsEnabled = isIdle;
         StartButton.Content = phase switch
         {
@@ -140,10 +138,61 @@ public partial class MainWindow : Window
             _ => "Focus Active"
         };
 
-        bool showPreWarning = phase == TimerPhase.PreWarning && _engine.CanExtend;
+        bool showPreWarning = phase == TimerPhase.PreWarning;
         PreWarningPanel.Visibility = showPreWarning ? Visibility.Visible : Visibility.Hidden;
+        ExtendButton.IsEnabled = _engine.CanExtend;
 
         _overlayCoordinator.SyncWithEngine(_engine, RenderState);
+        SyncPreWarningBanner(phase, displayed);
+
+        bool enteredFocus = phase == TimerPhase.Focus && _lastRenderedPhase != TimerPhase.Focus;
+        _lastRenderedPhase = phase;
+        if (enteredFocus)
+            WindowState = WindowState.Minimized;
+    }
+
+    private void SyncPreWarningBanner(TimerPhase phase, TimeSpan remaining)
+    {
+        if (phase != TimerPhase.PreWarning)
+        {
+            _bannerDismissed = false;
+            ClosePreWarningBanner();
+            return;
+        }
+
+        if (_bannerDismissed)
+        {
+            ClosePreWarningBanner();
+            return;
+        }
+
+        if (_preWarningBanner is null)
+        {
+            _preWarningBanner = new PreWarningBannerWindow(
+                onExtend: () =>
+                {
+                    _engine.TryExtendFocus();
+                    RenderState();
+                },
+                onDismiss: () =>
+                {
+                    _bannerDismissed = true;
+                    ClosePreWarningBanner();
+                });
+        }
+
+        _preWarningBanner.UpdateState(FormatTimeSpan(remaining), _engine.CanExtend);
+        if (!_preWarningBanner.IsVisible)
+            _preWarningBanner.Show();
+    }
+
+    private void ClosePreWarningBanner()
+    {
+        if (_preWarningBanner is null)
+            return;
+
+        _preWarningBanner.Close();
+        _preWarningBanner = null;
     }
 
     private static void UpdatePresetButton(System.Windows.Controls.Button button, bool isSelected, bool isEnabled)
@@ -189,8 +238,7 @@ public partial class MainWindow : Window
             return;
 
         TimerPreset preset = BuildSelectedPreset();
-        _engine.StartFocus(preset, EntryStepBox.Text);
-        EntryStepBox.Text = string.Empty;
+        _engine.StartFocus(preset, null);
         RenderState();
     }
 
@@ -198,5 +246,15 @@ public partial class MainWindow : Window
     {
         _engine.TryExtendFocus();
         RenderState();
+    }
+
+    private void OnMinimizeClick(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+
+    private void OnCloseClick(object sender, RoutedEventArgs e)
+    {
+        Close();
     }
 }
