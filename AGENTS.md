@@ -1,5 +1,7 @@
 ## Project Architecture
 
+Use "Break Keeper" as the canonical product name.
+Use "BreakKeeper" as the canonical product identifier.
 Target .NET 8 C# WPF on Windows for the desktop application.
 Decouple timer state transitions from platform UI layers.
 Persist active session state atomically to local storage.
