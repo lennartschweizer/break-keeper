@@ -1,6 +1,6 @@
-using BreakEnforcer.Core;
+using Core;
 
-namespace BreakEnforcer.Core.Tests;
+namespace Core.Tests;
 
 public sealed class BreakKeyFilterTests
 {

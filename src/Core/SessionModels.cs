@@ -1,4 +1,4 @@
-namespace BreakEnforcer.Core;
+namespace Core;
 
 public enum TimerPhase
 {
@@ -32,6 +32,54 @@ public sealed record TimerPreset(
         TimeSpan.FromMinutes(2),
         TimeSpan.FromMinutes(5),
         MaxExtensions: 1);
+
+    public const int MinCustomMinutes = 1;
+    public const int MaxCustomMinutes = 999;
+
+    public static bool CanAcceptDurationInput(string? candidate)
+    {
+        if (string.IsNullOrEmpty(candidate))
+            return false;
+
+        return candidate.Length <= 3
+            && IsDigitsOnly(candidate)
+            && candidate[0] != '0';
+    }
+
+    public static bool TryParseCustomMinutes(string? text, out int minutes)
+    {
+        minutes = 0;
+        if (string.IsNullOrWhiteSpace(text))
+            return false;
+
+        string trimmed = text.Trim();
+        if (!IsDigitsOnly(trimmed))
+            return false;
+
+        if (int.TryParse(trimmed, out int parsed)
+            && parsed >= MinCustomMinutes
+            && parsed <= MaxCustomMinutes)
+        {
+            minutes = parsed;
+            return true;
+        }
+
+        return false;
+    }
+
+    public static bool IsDigitsOnly(string? text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return false;
+
+        foreach (char c in text)
+        {
+            if (c < '0' || c > '9')
+                return false;
+        }
+
+        return true;
+    }
 
     public void Validate()
     {

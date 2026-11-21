@@ -12,20 +12,21 @@ if ([string]::IsNullOrWhiteSpace($appId)) {
 }
 
 $runKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
-$legacyName = "FocusEnforcer"
+$legacyNames = @("FocusEnforcer", "BreakEnforcer")
 $taskName = $appId
 $exePath = Join-Path $root "out\release\$appId.App.exe"
 
-if (Get-ItemProperty -Path $runKey -Name $legacyName -ErrorAction SilentlyContinue) {
-    Remove-ItemProperty -Path $runKey -Name $legacyName
+foreach ($legacyName in $legacyNames) {
+    if (Get-ItemProperty -Path $runKey -Name $legacyName -ErrorAction SilentlyContinue) {
+        Remove-ItemProperty -Path $runKey -Name $legacyName
+    }
+    $legacyTask = Get-ScheduledTask -TaskName $legacyName -ErrorAction SilentlyContinue
+    if ($legacyTask) {
+        Unregister-ScheduledTask -TaskName $legacyName -Confirm:$false
+    }
 }
 if (Get-ItemProperty -Path $runKey -Name $taskName -ErrorAction SilentlyContinue) {
     Remove-ItemProperty -Path $runKey -Name $taskName
-}
-
-$legacyTask = Get-ScheduledTask -TaskName $legacyName -ErrorAction SilentlyContinue
-if ($legacyTask) {
-    Unregister-ScheduledTask -TaskName $legacyName -Confirm:$false
 }
 
 if ($Disable) {

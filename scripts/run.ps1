@@ -19,11 +19,11 @@ if (-not (Test-Path $dotnet)) {
 $config = if ($Release) { "Release" } else { "Debug" }
 $outDir = if ($Release) { Join-Path $root "out\release" } else { Join-Path $root "out\dev" }
 
-Get-Process -Name "FocusEnforcer.App", "$appId.App" -ErrorAction SilentlyContinue | Stop-Process -Force
+Get-Process -Name "FocusEnforcer.App", "BreakEnforcer.App", "$appId.App" -ErrorAction SilentlyContinue | Stop-Process -Force
 Start-Sleep -Milliseconds 300
 
 $publishArgs = @(
-    (Join-Path $root "src\$appId.App\$appId.App.csproj"),
+    (Join-Path $root "src\Desktop\Desktop.csproj"),
     "-c", $config,
     "-r", "win-x64",
     "--self-contained",

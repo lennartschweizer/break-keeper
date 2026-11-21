@@ -1,4 +1,4 @@
-namespace BreakEnforcer.Core;
+namespace Core;
 
 public sealed class FocusSessionEngine
 {

@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using BreakEnforcer.Core;
+using Core;
 
-namespace BreakEnforcer.App;
+namespace Desktop;
 
 public sealed class BreakKeyboardHook : IDisposable
 {
