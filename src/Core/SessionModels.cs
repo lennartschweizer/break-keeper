@@ -103,5 +103,4 @@ public sealed record SessionSnapshot(
     TimerPreset ActivePreset,
     string? EntryStep,
     DateTimeOffset? PhaseEndUtc,
-    int ExtensionsUsed,
-    string? EmergencyExitPhrase);
+    int ExtensionsUsed);

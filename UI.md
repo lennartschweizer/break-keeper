@@ -15,4 +15,4 @@ Inherits all visual tokens, typography, and interaction rules from `~/.gemini/UI
 
 - Full-bleed `#000000` topmost window spawned independently on every active monitor.
 - Centered monospace remaining break time (`#FFFFFF`) above a single phase badge (`BREAK` / `BREAK COMPLETE`); zero decorative elements or external links.
-- Unobtrusive emergency-exit trigger at bottom center; activating it reveals the random 24-character monospace challenge and 5-second hold control (`#FF453A`).
+- Unobtrusive single `Emergency Exit (Hold)` control at bottom center; pressing and holding for 15 seconds transitions its label to `Hold (<remaining>s)`.

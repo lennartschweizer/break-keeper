@@ -19,9 +19,9 @@
 - [x] Support full arrow-key navigation with clearly visible focus indicators across all controls (audit every window and control for remaining keyboard-navigation gaps).
 - [x] Centralize UI design tokens, shared `PhaseBadgeStyle` (`#8E8E93`), and outline-only button styles in `App.xaml`.
 - [x] Restrict custom duration fields to valid numeric values (reject non-numeric, empty, or out-of-range inputs with immediate UI validation) and auto-select all text on focus for immediate replacement.
-- [ ] Simplify Emergency Exit to a single 15s or 30s hold-only button (remove 24-character phrase): label `Emergency Exit (Hold)`, changing while pressed to `Hold (<remaining>s)` with a functional hold-progress animation (requires updating `AGENTS.md` and `UI.md` rule on approval).
+- [x] Simplify Emergency Exit to a single 15s hold-only button (remove 24-character phrase): label `Emergency Exit (Hold)`, changing while pressed to `Hold (<remaining>s)` without progress animation (`AGENTS.md` and `UI.md` updated).
 - [ ] Surface remaining focus time without restoring the window (taskbar title/tooltip or system tray toggle).
-- [ ] Open Question: Clarify functional progress animations (e.g., hold-button fill) vs. decorative animations in `~/.gemini/UI.md` (`Borderless-Filled` styling is now adopted in `~/.gemini/UI.md`).
+- [x] Open Question: Clarify functional progress animations vs. decorative animations in `~/.gemini/UI.md` (`Borderless-Filled` styling adopted; hold-button animation removed so `Zero decorative noise` remains strict).
 
 ## P4 — Release, Monetization, Cross-Device Sync & Deferred Ideas (Out of MVP)
 - [ ] Release & Freemium monetization: maximize revenue via freemium model (e.g., fixed focus/break presets free, custom focus/break durations paid via lifetime unlock or similar).

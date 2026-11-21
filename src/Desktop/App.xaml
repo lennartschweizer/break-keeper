@@ -25,6 +25,13 @@
             <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
 
+        <Style x:Key="TimerDisplayStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+
         <!-- Shared Controls -->
         <Style x:Key="FilledButtonStyle" TargetType="Button">
             <Setter Property="FontFamily" Value="{StaticResource FontUi}"/>

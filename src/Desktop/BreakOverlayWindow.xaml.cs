@@ -13,7 +13,7 @@ public partial class BreakOverlayWindow : Window
 {
     private static readonly IntPtr HwndTopMost = new(-1);
     private const uint SwpShowWindow = 0x0040;
-    private static readonly TimeSpan RequiredHoldDuration = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan RequiredHoldDuration = TimeSpan.FromSeconds(15);
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern bool SetWindowPos(
@@ -44,8 +44,7 @@ public partial class BreakOverlayWindow : Window
     private static extern bool BringWindowToTop(IntPtr hWnd);
 
     private readonly MonitorRect _bounds;
-    private readonly string _expectedPhrase;
-    private readonly Action<string, bool> _onEmergencyExitAttempt;
+    private readonly Action<bool> _onEmergencyExitAttempt;
     private readonly Action _onStartNextFocus;
     private readonly Action _onStopToIdle;
     private readonly DispatcherTimer _holdTimer;
@@ -55,21 +54,16 @@ public partial class BreakOverlayWindow : Window
 
     public BreakOverlayWindow(
         MonitorRect bounds,
-        string expectedPhrase,
-        Action<string, bool> onEmergencyExitAttempt,
+        Action<bool> onEmergencyExitAttempt,
         Action onStartNextFocus,
         Action onStopToIdle)
     {
         InitializeComponent();
 
         _bounds = bounds;
-        _expectedPhrase = expectedPhrase;
         _onEmergencyExitAttempt = onEmergencyExitAttempt;
         _onStartNextFocus = onStartNextFocus;
         _onStopToIdle = onStopToIdle;
-
-        ChallengePhraseText.Text = expectedPhrase;
-        CommandManager.AddPreviewExecutedHandler(ChallengeInputBox, OnPreviewCommandExecuted);
 
         _holdTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(50) };
         _holdTimer.Tick += OnHoldTimerTick;
@@ -94,8 +88,7 @@ public partial class BreakOverlayWindow : Window
             PhaseTitleText.Text = "BREAK COMPLETE";
             CountdownText.Text = "00:00";
             BreakCompleteActions.Visibility = Visibility.Visible;
-            EmergencyPanel.Visibility = Visibility.Collapsed;
-            ToggleEmergencyButton.Visibility = Visibility.Collapsed;
+            EmergencyExitButton.Visibility = Visibility.Collapsed;
             ResetHold();
             if (enteredBreakCompleted && _bounds.IsPrimary && IsLoaded)
                 BringToForegroundAndFocus();
@@ -106,7 +99,7 @@ public partial class BreakOverlayWindow : Window
         int totalMinutes = (int)Math.Floor(remaining.TotalMinutes);
         CountdownText.Text = $"{totalMinutes:D2}:{remaining.Seconds:D2}";
         BreakCompleteActions.Visibility = Visibility.Collapsed;
-        ToggleEmergencyButton.Visibility = Visibility.Visible;
+        EmergencyExitButton.Visibility = Visibility.Visible;
     }
 
     private void OnStartNextFocusClick(object sender, RoutedEventArgs e) => _onStartNextFocus();
@@ -142,39 +135,9 @@ public partial class BreakOverlayWindow : Window
             return;
         }
 
-        if (EmergencyPanel.Visibility == Visibility.Visible)
-        {
-            IInputElement? focused = Keyboard.FocusedElement;
-            if (e.Key == Key.Down)
-            {
-                if (focused == ChallengeInputBox)
-                {
-                    if (HoldExitButton.IsEnabled)
-                        HoldExitButton.Focus();
-                    else
-                        ToggleEmergencyButton.Focus();
-                    e.Handled = true;
-                }
-                else if (focused == HoldExitButton)
-                {
-                    ToggleEmergencyButton.Focus();
-                    e.Handled = true;
-                }
-            }
-            else if (e.Key == Key.Up)
-            {
-                if (focused == ToggleEmergencyButton && HoldExitButton.IsEnabled)
-                    HoldExitButton.Focus();
-                else if (focused != ChallengeInputBox)
-                    ChallengeInputBox.Focus();
-                e.Handled = true;
-            }
-            return;
-        }
-
         if (e.Key is Key.Up or Key.Down or Key.Left or Key.Right)
         {
-            ToggleEmergencyButton.Focus();
+            EmergencyExitButton.Focus();
             e.Handled = true;
         }
     }
@@ -244,36 +207,7 @@ public partial class BreakOverlayWindow : Window
             e.Cancel = true;
     }
 
-    private static void OnPreviewCommandExecuted(object sender, ExecutedRoutedEventArgs e)
-    {
-        if (e.Command == ApplicationCommands.Paste)
-            e.Handled = true;
-    }
-
-    private void OnToggleEmergencyClick(object sender, RoutedEventArgs e)
-    {
-        bool show = EmergencyPanel.Visibility != Visibility.Visible;
-        EmergencyPanel.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
-        if (show)
-            ChallengeInputBox.Focus();
-    }
-
-    private void OnChallengeInputChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-    {
-        bool matched = EmergencyExitChallenge.Matches(_expectedPhrase, ChallengeInputBox.Text);
-        HoldExitButton.IsEnabled = matched;
-        if (!matched)
-            ResetHold();
-    }
-
-    private void OnHoldStart(object sender, MouseButtonEventArgs e)
-    {
-        if (!HoldExitButton.IsEnabled)
-            return;
-
-        _holdStopwatch.Restart();
-        _holdTimer.Start();
-    }
+    private void OnHoldStart(object sender, MouseButtonEventArgs e) => BeginHold();
 
     private void OnHoldCancel(object sender, MouseButtonEventArgs e) => ResetHold();
 
@@ -281,6 +215,41 @@ public partial class BreakOverlayWindow : Window
     {
         if (_holdStopwatch.IsRunning)
             ResetHold();
+    }
+
+    private void OnHoldButtonPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key is Key.Space or Key.Enter)
+        {
+            e.Handled = true;
+            if (!e.IsRepeat && !_holdStopwatch.IsRunning)
+                BeginHold();
+        }
+    }
+
+    private void OnHoldButtonPreviewKeyUp(object sender, KeyEventArgs e)
+    {
+        if (e.Key is Key.Space or Key.Enter)
+        {
+            e.Handled = true;
+            ResetHold();
+        }
+    }
+
+    private void OnHoldButtonLostFocus(object sender, RoutedEventArgs e)
+    {
+        if (_holdStopwatch.IsRunning)
+            ResetHold();
+    }
+
+    private void BeginHold()
+    {
+        if (_isBreakCompleted)
+            return;
+
+        _holdStopwatch.Restart();
+        _holdTimer.Start();
+        EmergencyExitButton.Content = $"Hold ({(int)RequiredHoldDuration.TotalSeconds}s)";
     }
 
     private void OnHoldTimerTick(object? sender, EventArgs e)
@@ -293,18 +262,18 @@ public partial class BreakOverlayWindow : Window
         {
             _holdTimer.Stop();
             _holdStopwatch.Reset();
-            _onEmergencyExitAttempt(ChallengeInputBox.Text, true);
+            _onEmergencyExitAttempt(true);
             return;
         }
 
-        double remainingSec = Math.Max(0.1, (RequiredHoldDuration - elapsed).TotalSeconds);
-        HoldExitButton.Content = $"Hold {remainingSec:F1}s...";
+        int remainingSec = Math.Max(1, (int)Math.Ceiling((RequiredHoldDuration - elapsed).TotalSeconds));
+        EmergencyExitButton.Content = $"Hold ({remainingSec}s)";
     }
 
     private void ResetHold()
     {
         _holdTimer.Stop();
         _holdStopwatch.Reset();
-        HoldExitButton.Content = "Hold 5s to Exit";
+        EmergencyExitButton.Content = "Emergency Exit (Hold)";
     }
 }
