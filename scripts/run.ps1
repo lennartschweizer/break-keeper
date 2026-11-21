@@ -5,6 +5,12 @@ param(
 $ErrorActionPreference = "Stop"
 
 $root = Split-Path -Parent $PSScriptRoot
+[xml]$props = Get-Content (Join-Path $root "Directory.Build.props")
+$appId = $props.Project.PropertyGroup.AppId
+if ([string]::IsNullOrWhiteSpace($appId)) {
+    throw "AppId missing in Directory.Build.props"
+}
+
 $dotnet = Join-Path $env:LOCALAPPDATA "Microsoft\dotnet\dotnet.exe"
 if (-not (Test-Path $dotnet)) {
     throw "dotnet.exe not found at $dotnet"
@@ -13,11 +19,11 @@ if (-not (Test-Path $dotnet)) {
 $config = if ($Release) { "Release" } else { "Debug" }
 $outDir = if ($Release) { Join-Path $root "out\release" } else { Join-Path $root "out\dev" }
 
-Get-Process -Name "FocusEnforcer.App" -ErrorAction SilentlyContinue | Stop-Process -Force
+Get-Process -Name "FocusEnforcer.App", "$appId.App" -ErrorAction SilentlyContinue | Stop-Process -Force
 Start-Sleep -Milliseconds 300
 
 $publishArgs = @(
-    (Join-Path $root "src\FocusEnforcer.App\FocusEnforcer.App.csproj"),
+    (Join-Path $root "src\$appId.App\$appId.App.csproj"),
     "-c", $config,
     "-r", "win-x64",
     "--self-contained",
@@ -32,4 +38,9 @@ if ($LASTEXITCODE -ne 0) {
     throw "dotnet publish failed with exit code $LASTEXITCODE"
 }
 
-Start-Process (Join-Path $outDir "FocusEnforcer.App.exe")
+$exePath = Join-Path $outDir "$appId.App.exe"
+if ($Release -and (Get-ScheduledTask -TaskName $appId -ErrorAction SilentlyContinue)) {
+    Start-ScheduledTask -TaskName $appId
+} else {
+    Start-Process $exePath
+}

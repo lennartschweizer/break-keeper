@@ -4,14 +4,28 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$runKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
-$entryName = "FocusEnforcer"
-$taskName = "FocusEnforcer"
 $root = Split-Path -Parent $PSScriptRoot
-$exePath = Join-Path $root "out\release\FocusEnforcer.App.exe"
+[xml]$props = Get-Content (Join-Path $root "Directory.Build.props")
+$appId = $props.Project.PropertyGroup.AppId
+if ([string]::IsNullOrWhiteSpace($appId)) {
+    throw "AppId missing in Directory.Build.props"
+}
 
-if (Get-ItemProperty -Path $runKey -Name $entryName -ErrorAction SilentlyContinue) {
-    Remove-ItemProperty -Path $runKey -Name $entryName
+$runKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
+$legacyName = "FocusEnforcer"
+$taskName = $appId
+$exePath = Join-Path $root "out\release\$appId.App.exe"
+
+if (Get-ItemProperty -Path $runKey -Name $legacyName -ErrorAction SilentlyContinue) {
+    Remove-ItemProperty -Path $runKey -Name $legacyName
+}
+if (Get-ItemProperty -Path $runKey -Name $taskName -ErrorAction SilentlyContinue) {
+    Remove-ItemProperty -Path $runKey -Name $taskName
+}
+
+$legacyTask = Get-ScheduledTask -TaskName $legacyName -ErrorAction SilentlyContinue
+if ($legacyTask) {
+    Unregister-ScheduledTask -TaskName $legacyName -Confirm:$false
 }
 
 if ($Disable) {
