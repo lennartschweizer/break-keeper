@@ -20,7 +20,7 @@
 - [x] Centralize UI design tokens, shared `PhaseBadgeStyle` (`#8E8E93`), and outline-only button styles in `App.xaml`.
 - [x] Restrict custom duration fields to valid numeric values (reject non-numeric, empty, or out-of-range inputs with immediate UI validation) and auto-select all text on focus for immediate replacement.
 - [x] Simplify Emergency Exit to a single 15s hold-only button (remove 24-character phrase): label `Emergency Exit (Hold)`, changing while pressed to `Hold (<remaining>s)` without progress animation (`AGENTS.md` and `UI.md` updated).
-- [ ] Surface remaining focus time without restoring the window (taskbar title/tooltip or system tray toggle).
+- [x] Surface remaining focus time without restoring the window (transparent system tray icon with remaining-time tooltip and click toggle).
 - [x] Open Question: Clarify functional progress animations vs. decorative animations in `~/.gemini/UI.md` (`Borderless-Filled` styling adopted; hold-button animation removed so `Zero decorative noise` remains strict).
 
 ## P4 — Release, Monetization, Cross-Device Sync & Deferred Ideas (Out of MVP)
