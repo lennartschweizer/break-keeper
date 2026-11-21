@@ -92,9 +92,8 @@ public partial class BreakOverlayWindow : Window
         if (isBreakCompleted)
         {
             PhaseTitleText.Text = "BREAK COMPLETE";
-            PhaseTitleText.Foreground = System.Windows.Media.Brushes.LimeGreen;
+            PhaseTitleText.Foreground = System.Windows.Media.Brushes.White;
             CountdownText.Text = "00:00";
-            SubtitleText.Text = "Ready for the next focus block.";
             BreakCompleteActions.Visibility = Visibility.Visible;
             EmergencyPanel.Visibility = Visibility.Collapsed;
             ToggleEmergencyButton.Visibility = Visibility.Collapsed;
@@ -109,7 +108,6 @@ public partial class BreakOverlayWindow : Window
             System.Windows.Media.Color.FromRgb(0x8E, 0x8E, 0x93));
         int totalMinutes = (int)Math.Floor(remaining.TotalMinutes);
         CountdownText.Text = $"{totalMinutes:D2}:{remaining.Seconds:D2}";
-        SubtitleText.Text = "Step away from the screen.";
         BreakCompleteActions.Visibility = Visibility.Collapsed;
         ToggleEmergencyButton.Visibility = Visibility.Visible;
     }
