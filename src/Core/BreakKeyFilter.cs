@@ -1,4 +1,4 @@
-namespace BreakEnforcer.Core;
+namespace Core;
 
 public static class BreakKeyFilter
 {

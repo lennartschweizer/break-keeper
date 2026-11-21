@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Animation;
 
-namespace BreakEnforcer.App;
+namespace Desktop;
 
 public partial class PreWarningBannerWindow : Window
 {

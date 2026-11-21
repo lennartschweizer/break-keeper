@@ -1,16 +1,21 @@
-﻿using System.IO;
+using System.IO;
 using System.Windows;
 using System.Windows.Interop;
-using BreakEnforcer.Core;
+using Core;
 
-namespace BreakEnforcer.App;
+namespace Desktop;
 
 public partial class App : Application
 {
     protected override void OnStartup(StartupEventArgs e)
     {
-        string logDir = AppIdentity.GetAppDataDirectory();
-        string logPath = Path.Combine(logDir, "startup.log");
+        bool isSandbox = e.Args.Any(arg => string.Equals(arg, "--sandbox", StringComparison.OrdinalIgnoreCase));
+        string dataDir = isSandbox
+            ? Path.Combine(Path.GetTempPath(), "BreakKeeper-Sandbox", Guid.NewGuid().ToString("N"))
+            : AppIdentity.GetAppDataDirectory();
+        Directory.CreateDirectory(dataDir);
+
+        string logPath = Path.Combine(dataDir, "startup.log");
 
         DispatcherUnhandledException += (_, args) =>
         {
@@ -23,7 +28,7 @@ public partial class App : Application
 
         base.OnStartup(e);
 
-        var window = new MainWindow();
+        var window = new MainWindow(dataDir);
         MainWindow = window;
         window.Show();
         window.Activate();

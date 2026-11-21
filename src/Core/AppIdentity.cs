@@ -1,21 +1,24 @@
-namespace BreakEnforcer.Core;
+namespace Core;
 
 public static class AppIdentity
 {
-    public const string DisplayName = "Break Enforcer";
-    public const string ProductId = "BreakEnforcer";
-    public const string LegacyProductId = "FocusEnforcer";
+    public const string DisplayName = "Break Keeper";
+    public const string ProductId = "BreakKeeper";
     public const string BreakWindowTitle = $"{DisplayName} — Break";
+    private static readonly string[] LegacyProductIds = ["BreakEnforcer", "FocusEnforcer"];
 
     public static string GetAppDataDirectory()
     {
         string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         string currentDir = Path.Combine(localAppData, ProductId);
-        string legacyDir = Path.Combine(localAppData, LegacyProductId);
 
         Directory.CreateDirectory(currentDir);
-        MigrateFileIfMissing(legacyDir, currentDir, "session.json");
-        MigrateFileIfMissing(legacyDir, currentDir, "audit.log");
+        foreach (string legacyId in LegacyProductIds)
+        {
+            string legacyDir = Path.Combine(localAppData, legacyId);
+            MigrateFileIfMissing(legacyDir, currentDir, "session.json");
+            MigrateFileIfMissing(legacyDir, currentDir, "audit.log");
+        }
         return currentDir;
     }
 
