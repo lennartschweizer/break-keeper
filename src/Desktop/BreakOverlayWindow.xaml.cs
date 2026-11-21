@@ -5,9 +5,9 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using BreakEnforcer.Core;
+using Core;
 
-namespace BreakEnforcer.App;
+namespace Desktop;
 
 public partial class BreakOverlayWindow : Window
 {
@@ -92,7 +92,6 @@ public partial class BreakOverlayWindow : Window
         if (isBreakCompleted)
         {
             PhaseTitleText.Text = "BREAK COMPLETE";
-            PhaseTitleText.Foreground = System.Windows.Media.Brushes.White;
             CountdownText.Text = "00:00";
             BreakCompleteActions.Visibility = Visibility.Visible;
             EmergencyPanel.Visibility = Visibility.Collapsed;
@@ -104,8 +103,6 @@ public partial class BreakOverlayWindow : Window
         }
 
         PhaseTitleText.Text = "BREAK";
-        PhaseTitleText.Foreground = new System.Windows.Media.SolidColorBrush(
-            System.Windows.Media.Color.FromRgb(0x8E, 0x8E, 0x93));
         int totalMinutes = (int)Math.Floor(remaining.TotalMinutes);
         CountdownText.Text = $"{totalMinutes:D2}:{remaining.Seconds:D2}";
         BreakCompleteActions.Visibility = Visibility.Collapsed;
@@ -118,17 +115,49 @@ public partial class BreakOverlayWindow : Window
 
     private void OnOverlayPreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (!_isBreakCompleted || e.Key != Key.Enter)
-            return;
-
-        if (Keyboard.FocusedElement is System.Windows.Controls.Button focusedButton &&
-            focusedButton != StartNextFocusButton)
+        if (_isBreakCompleted)
         {
+            if (e.Key is Key.Down or Key.Right)
+            {
+                StopIdleButton.Focus();
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Key is Key.Up or Key.Left)
+            {
+                StartNextFocusButton.Focus();
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Key == Key.Enter)
+            {
+                e.Handled = true;
+                if (Keyboard.FocusedElement == StopIdleButton)
+                    _onStopToIdle();
+                else
+                    _onStartNextFocus();
+            }
             return;
         }
 
-        e.Handled = true;
-        _onStartNextFocus();
+        if (EmergencyPanel.Visibility == Visibility.Visible)
+        {
+            if (e.Key == Key.Down && Keyboard.FocusedElement == ChallengeInputBox)
+            {
+                if (HoldExitButton.IsEnabled)
+                    HoldExitButton.Focus();
+                else
+                    ToggleEmergencyButton.Focus();
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Up && Keyboard.FocusedElement != ChallengeInputBox)
+            {
+                ChallengeInputBox.Focus();
+                e.Handled = true;
+            }
+        }
     }
 
     private void BringToForegroundAndFocus()

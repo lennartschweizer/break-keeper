@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace BreakEnforcer.App;
+namespace Desktop;
 
 public readonly record struct MonitorRect(int Left, int Top, int Width, int Height, bool IsPrimary);
 
