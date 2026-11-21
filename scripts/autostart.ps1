@@ -13,8 +13,19 @@ if ([string]::IsNullOrWhiteSpace($appId)) {
 
 $runKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
 $legacyNames = @("FocusEnforcer", "BreakEnforcer")
+$legacyShortcutNames = @("Focus Enforcer", "Break Enforcer")
 $taskName = $appId
+$displayName = "Break Keeper"
 $exePath = Join-Path $root "out\release\$appId.App.exe"
+$programsDir = [Environment]::GetFolderPath("Programs")
+$shortcutPath = Join-Path $programsDir "$displayName.lnk"
+
+foreach ($legacyShortcut in $legacyShortcutNames) {
+    $legacyLnk = Join-Path $programsDir "$legacyShortcut.lnk"
+    if (Test-Path $legacyLnk) {
+        Remove-Item $legacyLnk -Force
+    }
+}
 
 foreach ($legacyName in $legacyNames) {
     if (Get-ItemProperty -Path $runKey -Name $legacyName -ErrorAction SilentlyContinue) {
@@ -30,6 +41,9 @@ if (Get-ItemProperty -Path $runKey -Name $taskName -ErrorAction SilentlyContinue
 }
 
 if ($Disable) {
+    if (Test-Path $shortcutPath) {
+        Remove-Item $shortcutPath -Force
+    }
     $existingTask = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
     if ($existingTask) {
         Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
@@ -70,4 +84,12 @@ if ($registeredAction -ne $exePath) {
     throw "Scheduled task verification failed: expected $exePath, got $registeredAction"
 }
 
+$shell = New-Object -ComObject WScript.Shell
+$shortcut = $shell.CreateShortcut($shortcutPath)
+$shortcut.TargetPath = $exePath
+$shortcut.WorkingDirectory = Split-Path -Parent $exePath
+$shortcut.IconLocation = "$exePath,0"
+$shortcut.Save()
+
 Write-Output "Registered $taskName scheduled logon task: $registeredAction"
+Write-Output "Created Start Menu shortcut: $shortcutPath"
