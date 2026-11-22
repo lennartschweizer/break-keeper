@@ -3,5 +3,8 @@
     <Product>Break Keeper</Product>
     <AppId>BreakKeeper</AppId>
     <Version>1.0.0</Version>
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
+    <NuGetAuditLevel>low</NuGetAuditLevel>
   </PropertyGroup>
 </Project>
