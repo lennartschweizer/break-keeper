@@ -37,7 +37,7 @@
 - [x] Enable NuGetAudit in build configuration and add GitHub Dependabot/CodeQL security workflows.
 - [x] Harden NuGet and .NET build security (enable `packages.lock.json` with CI `--locked-mode`, treat `NU1901`–`NU1904` warnings as errors, and enable latest .NET analyzers). (`0633df5`)
 - [x] Harden GitHub repository and workflows (pin Actions to SHA hashes, enforce read-only default token permissions, add `SECURITY.md`, enable Secret Scanning/Push Protection, and add OpenSSF Scorecard workflow). (`f9bd70d`)
-- [ ] Add `Roslynator.Analyzers` and an automated `dotnet test` CI workflow on push/PR.
+- [x] Add `Roslynator.Analyzers` and an automated `dotnet test` CI workflow on push/PR. (`4cb61fc`)
 - [ ] Move GitHub Release builds to ephemeral CI workflows with SLSA provenance generation.
 - [ ] Free public Windows release (Phase 2 — Microsoft Store): package as MSIX with manifest startup task and submit via free individual developer account.
 - [ ] Freemium monetization tied to future Pro features (e.g., cross-device sync, scheduling, call detection) rather than paywalling existing timer inputs.
