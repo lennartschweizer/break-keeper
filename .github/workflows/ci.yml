@@ -1,0 +1,33 @@
+name: "CI"
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore App.sln --locked-mode
+
+      - name: Build solution
+        run: dotnet build App.sln --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test App.sln --configuration Release --no-build --verbosity normal
