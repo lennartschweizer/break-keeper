@@ -2,7 +2,7 @@
 
 A minimalist Windows focus timer that enforces real breaks.
 
-Set your focus and break durations and start a session. Two minutes before a break begins, a small warning lets you wrap up or extend the session once by 5 minutes. When the break starts, Break Keeper locks all screens with a fullscreen overlay that cannot easily be bypassed or dismissed until the timer runs out — with a 15-second hold-only emergency exit if you genuinely need to get back to work.
+Set your focus and break durations and start a session. Two minutes before a break begins, a small warning lets you wrap up or extend the session once by 5 minutes. When the break starts, Break Keeper locks all screens with a fullscreen overlay that cannot easily be bypassed or dismissed until the timer runs out — with a 15-second hold emergency exit if you genuinely need to get back to work.
 
 ## Installation
 

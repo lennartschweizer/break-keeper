@@ -23,6 +23,9 @@
 - [x] Surface remaining focus time without restoring the window (transparent system tray icon with remaining-time tooltip and click toggle).
 - [x] Hide main window from the taskbar when minimized or toggled to tray.
 - [x] Open Question: Clarify functional progress animations vs. decorative animations in `~/.gemini/UI.md` (`Borderless-Filled` styling adopted; hold-button animation removed so `Zero decorative noise` remains strict).
+- [ ] Centralize fixed button size tokens and shared styles in `App.xaml` (remove per-button ad-hoc `Height` overrides across all windows) and enforce token-based button sizing in `UI.md`.
+- [x] Rebuild `out/release/BreakKeeper.App.exe` so the autostart executable includes all latest UI fixes.
+- [x] Replace internal `hold-only` phrasing in `README.md` with end-user wording (`15-second hold emergency exit`).
 
 ## P4 — Release, Monetization, Cross-Device Sync & Deferred Ideas (Out of MVP)
 - [x] Free public Windows release (Phase 1 — GitHub Releases): package Release build archive with README usage/SmartScreen notes. (`v1.0.0`, `3ffbbbc`)
