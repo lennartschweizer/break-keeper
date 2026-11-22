@@ -34,7 +34,10 @@
 
 ## P4 — Release, Monetization, Cross-Device Sync & Deferred Ideas (Out of MVP)
 - [x] Free public Windows release (Phase 1 — GitHub Releases): package Release build archive with README usage/SmartScreen notes. (`v1.0.0`, `3ffbbbc`)
-- [ ] Enable NuGetAudit in build configuration and add GitHub Dependabot/CodeQL security workflows.
+- [x] Enable NuGetAudit in build configuration and add GitHub Dependabot/CodeQL security workflows.
+- [ ] Harden NuGet and .NET build security (enable `packages.lock.json` with CI `--locked-mode`, treat `NU1901`–`NU1904` warnings as errors, and enable latest .NET analyzers).
+- [ ] Harden GitHub repository and workflows (pin Actions to SHA hashes, enforce read-only default token permissions, add `SECURITY.md`, enable Secret Scanning/Push Protection, and add OpenSSF Scorecard workflow).
+- [ ] Move GitHub Release builds to ephemeral CI workflows with SLSA provenance generation.
 - [ ] Free public Windows release (Phase 2 — Microsoft Store): package as MSIX with manifest startup task and submit via free individual developer account.
 - [ ] Freemium monetization tied to future Pro features (e.g., cross-device sync, scheduling, call detection) rather than paywalling existing timer inputs.
 - [ ] Add a dedicated settings view to customize all timer, pre-warning (including banner display duration), extension, hold-duration, autostart, and behavior preferences.
