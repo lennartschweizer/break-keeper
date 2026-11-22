@@ -9,16 +9,19 @@ public partial class App : Application
 {
     protected override void OnStartup(StartupEventArgs e)
     {
-        bool isPreviewBreak = e.Args.Any(arg => string.Equals(arg, "--preview-break", StringComparison.OrdinalIgnoreCase));
-        bool isSandbox = isPreviewBreak
+        SessionSnapshot? previewSnapshot = ResolvePreviewSnapshot(e.Args);
+        bool isSandbox = previewSnapshot is not null
             || e.Args.Any(arg => string.Equals(arg, "--sandbox", StringComparison.OrdinalIgnoreCase));
         string dataDir = isSandbox
             ? Path.Combine(Path.GetTempPath(), "BreakKeeper-Sandbox", Guid.NewGuid().ToString("N"))
             : AppIdentity.GetAppDataDirectory();
         Directory.CreateDirectory(dataDir);
 
-        if (isPreviewBreak)
-            SeedPreviewBreakSession(dataDir);
+        if (previewSnapshot is not null)
+        {
+            var store = new JsonSessionStore(Path.Combine(dataDir, "session.json"));
+            store.Save(previewSnapshot);
+        }
 
         string logPath = Path.Combine(dataDir, "startup.log");
 
@@ -42,14 +45,41 @@ public partial class App : Application
         File.AppendAllText(logPath, $"{DateTimeOffset.Now:O} MainWindow shown HWND={hwnd} Visible={window.IsVisible}{Environment.NewLine}");
     }
 
-    private static void SeedPreviewBreakSession(string dataDir)
+    private static SessionSnapshot? ResolvePreviewSnapshot(string[] args)
     {
-        var store = new JsonSessionStore(Path.Combine(dataDir, "session.json"));
-        store.Save(new SessionSnapshot(
-            TimerPhase.Break,
-            TimerPreset.Starter25,
-            EntryStep: null,
-            PhaseEndUtc: DateTimeOffset.UtcNow.AddSeconds(20),
-            ExtensionsUsed: 0));
+        if (HasArg(args, "--preview-break-complete"))
+        {
+            return new SessionSnapshot(
+                TimerPhase.BreakCompleted,
+                TimerPreset.Starter25,
+                EntryStep: null,
+                PhaseEndUtc: null,
+                ExtensionsUsed: 0);
+        }
+
+        if (HasArg(args, "--preview-break"))
+        {
+            return new SessionSnapshot(
+                TimerPhase.Break,
+                TimerPreset.Starter25,
+                EntryStep: null,
+                PhaseEndUtc: DateTimeOffset.UtcNow.AddSeconds(20),
+                ExtensionsUsed: 0);
+        }
+
+        if (HasArg(args, "--preview-prewarning"))
+        {
+            return new SessionSnapshot(
+                TimerPhase.PreWarning,
+                TimerPreset.Starter25,
+                EntryStep: null,
+                PhaseEndUtc: DateTimeOffset.UtcNow.AddMinutes(2),
+                ExtensionsUsed: 0);
+        }
+
+        return null;
     }
+
+    private static bool HasArg(string[] args, string flag) =>
+        args.Any(arg => string.Equals(arg, flag, StringComparison.OrdinalIgnoreCase));
 }
