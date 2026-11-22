@@ -487,5 +487,7 @@ $RECYCLE.BIN/
 out/
 
 # Local project planning
+AGENTS.md
+UI.md
 BACKLOG.md
 PLAN.md
