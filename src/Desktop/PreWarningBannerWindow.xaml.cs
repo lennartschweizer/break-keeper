@@ -66,7 +66,7 @@ public partial class PreWarningBannerWindow : Window
             return;
 
         int exStyle = GetWindowLong(hwnd, GwlExStyle);
-        SetWindowLong(hwnd, GwlExStyle, exStyle | WsExNoActivate);
+        _ = SetWindowLong(hwnd, GwlExStyle, exStyle | WsExNoActivate);
     }
 
     private void PositionBottomRight()

@@ -38,7 +38,7 @@ jobs:
           languages: ${{ matrix.language }}
 
       - name: Restore dependencies
-        run: dotnet restore App.sln
+        run: dotnet restore App.sln --locked-mode
 
       - name: Build solution
         run: dotnet build App.sln --configuration Release --no-restore
