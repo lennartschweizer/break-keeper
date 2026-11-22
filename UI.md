@@ -2,6 +2,10 @@
 
 Inherits all visual tokens, typography, and interaction rules from `~/.gemini/UI.md`.
 
+## Shared Controls
+
+- All buttons inherit fixed height and padding from centralized size tokens (`ButtonHeightStandard` 44px for primary/secondary actions, `ButtonHeightCompact` 32px for banner/utility actions, `IconButtonSizeCompact` 28px for compact icon actions, `TitleBarButtonStyle` 40x36px); per-button ad-hoc `Height` overrides in window XAML are banned.
+
 ## Main Control Window
 
 - Compact single-view layout directly on `#000000` background (no outer card or bounding box; `#101010`/`#181818` reserved for controls and inputs) with fixed dimensions to prevent layout shift.
