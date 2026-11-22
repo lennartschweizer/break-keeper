@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -7,7 +8,7 @@ using Core;
 
 namespace Desktop;
 
-public partial class MainWindow : Window
+public partial class MainWindow : Window, IDisposable
 {
     private readonly FocusSessionEngine _engine;
     private readonly JsonDurationPreferencesStore _preferencesStore;
@@ -117,8 +118,8 @@ public partial class MainWindow : Window
         _isSyncingInputs = true;
         try
         {
-            CustomFocusBox.Text = focusMinutes.ToString();
-            CustomBreakBox.Text = breakMinutes.ToString();
+            CustomFocusBox.Text = focusMinutes.ToString(CultureInfo.InvariantCulture);
+            CustomBreakBox.Text = breakMinutes.ToString(CultureInfo.InvariantCulture);
         }
         finally
         {
@@ -451,4 +452,11 @@ public partial class MainWindow : Window
 
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
+
+    public void Dispose()
+    {
+        _overlayCoordinator.Dispose();
+        _trayIcon.Dispose();
+        GC.SuppressFinalize(this);
+    }
 }
