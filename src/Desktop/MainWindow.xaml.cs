@@ -30,11 +30,8 @@ public partial class MainWindow : Window
         DataObject.AddPastingHandler(CustomFocusBox, OnNumericPasting);
         DataObject.AddPastingHandler(CustomBreakBox, OnNumericPasting);
         SourceInitialized += (_, _) => ApplyRoundedWindowCorners();
-        Loaded += (_, _) =>
-        {
-            if (_engine.Phase == TimerPhase.Idle)
-                StartButton.Focus();
-        };
+        Loaded += (_, _) => EnsureIdleFocus();
+        Activated += (_, _) => EnsureIdleFocus();
         PreviewKeyDown += OnMainPreviewKeyDown;
 
         string appDataDir = string.IsNullOrWhiteSpace(dataDirectory)
@@ -200,7 +197,7 @@ public partial class MainWindow : Window
             HideToTray();
     }
 
-    private static readonly TimeSpan PreWarningBannerDuration = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan PreWarningBannerDuration = TimeSpan.FromSeconds(15);
 
     private void SyncPreWarningBanner(TimerPhase phase, TimeSpan remaining)
     {
@@ -350,6 +347,21 @@ public partial class MainWindow : Window
         Close();
     }
 
+    private void EnsureIdleFocus()
+    {
+        if (_engine.Phase != TimerPhase.Idle)
+            return;
+
+        IInputElement? focused = System.Windows.Input.Keyboard.FocusedElement;
+        if (focused == CustomFocusBox || focused == CustomBreakBox || focused == StartButton)
+            return;
+
+        if (StartButton.IsEnabled)
+            StartButton.Focus();
+        else
+            CustomFocusBox.Focus();
+    }
+
     private void OnMainPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
         if (_engine.Phase == TimerPhase.PreWarning)
@@ -368,29 +380,33 @@ public partial class MainWindow : Window
             return;
 
         IInputElement? focused = System.Windows.Input.Keyboard.FocusedElement;
-        if (focused is null)
-        {
-            if (e.Key is System.Windows.Input.Key.Up or System.Windows.Input.Key.Down or
-                System.Windows.Input.Key.Left or System.Windows.Input.Key.Right)
-            {
-                if (StartButton.IsEnabled)
-                    StartButton.Focus();
-                else
-                    CustomFocusBox.Focus();
-                e.Handled = true;
-            }
-            return;
-        }
-
         if (focused == CustomFocusBox || focused == CustomBreakBox)
         {
             e.Handled = HandleCustomBoxKeyDown(focused, e.Key);
             return;
         }
 
-        if (focused == StartButton && e.Key == System.Windows.Input.Key.Up)
+        if (focused == StartButton)
         {
-            CustomFocusBox.Focus();
+            switch (e.Key)
+            {
+                case System.Windows.Input.Key.Up:
+                case System.Windows.Input.Key.Left:
+                    CustomFocusBox.Focus();
+                    e.Handled = true;
+                    break;
+                case System.Windows.Input.Key.Right:
+                    CustomBreakBox.Focus();
+                    e.Handled = true;
+                    break;
+            }
+            return;
+        }
+
+        if (e.Key is System.Windows.Input.Key.Up or System.Windows.Input.Key.Down or
+            System.Windows.Input.Key.Left or System.Windows.Input.Key.Right)
+        {
+            EnsureIdleFocus();
             e.Handled = true;
         }
     }
@@ -400,7 +416,8 @@ public partial class MainWindow : Window
         switch (key)
         {
             case System.Windows.Input.Key.Down:
-                StartButton.Focus();
+                if (StartButton.IsEnabled)
+                    StartButton.Focus();
                 return true;
             case System.Windows.Input.Key.Enter:
                 if (focused == CustomFocusBox)

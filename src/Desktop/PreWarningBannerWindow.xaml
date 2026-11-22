@@ -12,7 +12,7 @@
         Focusable="False"
         Opacity="0"
         Background="Transparent">
-    <Border Background="{StaticResource SurfaceElevatedBrush}"
+    <Border Background="{StaticResource SurfacePrimaryBrush}"
             CornerRadius="8"
             Padding="14,10">
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
