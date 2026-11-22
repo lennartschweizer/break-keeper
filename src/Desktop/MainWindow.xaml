@@ -109,11 +109,9 @@
 
             <!-- Primary action button -->
             <Button x:Name="StartButton"
-                    Height="46"
                     Margin="0,12,0,0"
                     VerticalAlignment="Center"
                     Content="Start Focus"
-                    FontSize="14"
                     Style="{StaticResource PrimaryButtonStyle}"
                     Click="OnStartClick"/>
 
@@ -121,8 +119,6 @@
             <Button x:Name="ExtendButton"
                     HorizontalAlignment="Center"
                     Margin="0,18,0,0"
-                    Height="40"
-                    Padding="20,0"
                     Visibility="Collapsed"
                     Content="+5 min"
                     FontFamily="{StaticResource FontMono}"
