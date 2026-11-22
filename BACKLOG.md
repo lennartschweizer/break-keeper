@@ -26,6 +26,7 @@
 - [ ] Centralize fixed button size tokens and shared styles in `App.xaml` (remove per-button ad-hoc `Height` overrides across all windows) and enforce token-based button sizing in `UI.md`.
 - [x] Rebuild `out/release/BreakKeeper.App.exe` so the autostart executable includes all latest UI fixes.
 - [x] Replace internal `hold-only` phrasing in `README.md` with end-user wording (`15-second hold emergency exit`).
+- [x] Remove `real` qualifier from tagline in `README.md` (`A minimalist Windows focus timer that enforces breaks.`).
 
 ## P4 — Release, Monetization, Cross-Device Sync & Deferred Ideas (Out of MVP)
 - [x] Free public Windows release (Phase 1 — GitHub Releases): package Release build archive with README usage/SmartScreen notes. (`v1.0.0`, `3ffbbbc`)
