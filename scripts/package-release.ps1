@@ -35,6 +35,8 @@ $publishArgs = @(
     "--self-contained",
     "-p:PublishReadyToRun=true",
     "-p:PublishSingleFile=true",
+    "-p:NuGetLockFilePath=$(Join-Path $root 'out\publish.lock.json')",
+    "-p:RestoreLockedMode=false",
     "-p:DebugType=None",
     "-p:DebugSymbols=false",
     "-o", $stageDir
