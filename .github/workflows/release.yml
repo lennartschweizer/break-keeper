@@ -53,7 +53,7 @@ jobs:
           if ($readme -notmatch '(?ms)^## Installation\r?\n(.*?)(?=\r?\n## |\z)') {
             throw "Installation section not found in README.md"
           }
-          $installBlock = $Matches[1].Trim().Replace('<version>', $version)
+          $installBlock = ($Matches[1].Trim().Replace('<version>', $version)) -replace 'from the latest \[release\]\([^\)]+\)', 'from the assets below'
           $notesPath = Join-Path $env:RUNNER_TEMP "release-notes.md"
           [System.IO.File]::WriteAllText($notesPath, "### Installation`n`n$installBlock", [System.Text.UTF8Encoding]::new($false))
           $files = Get-ChildItem -Path "out/dist/*" -Include *.zip,*.sha256
