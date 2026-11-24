@@ -34,6 +34,7 @@ $publishArgs = @(
     "-r", "win-x64",
     "--self-contained",
     "-p:PublishReadyToRun=true",
+    "-p:PublishSingleFile=true",
     "-p:DebugType=None",
     "-p:DebugSymbols=false",
     "-o", $stageDir

@@ -20,7 +20,7 @@ $flagMap = @{
 
 $flag = $flagMap[$View]
 $project = Join-Path $root "src\Desktop\Desktop.csproj"
-$exePath = Join-Path $root "src\Desktop\bin\Debug\net8.0-windows\BreakKeeper.App.exe"
+$exePath = Join-Path $root "src\Desktop\bin\Debug\net8.0-windows\BreakKeeper.exe"
 
 & $dotnet build $project -c Debug --nologo
 if ($LASTEXITCODE -ne 0) {

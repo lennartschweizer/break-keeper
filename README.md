@@ -8,7 +8,7 @@ Set your focus and break durations and start a session. Two minutes before a bre
 
 1. Download `BreakKeeper-v<version>-win-x64.zip` from the latest [release](https://github.com/lennartschweizer/break-keeper/releases/latest).
 2. Extract the archive to a folder of your choice.
-3. Run `BreakKeeper.App.exe`.
+3. Run `BreakKeeper.exe`.
 
 > **Microsoft Defender SmartScreen:** Because the portable release binary is currently unsigned, Microsoft Defender SmartScreen may show a warning on first launch. Click **More info** → **Run anyway**.
 

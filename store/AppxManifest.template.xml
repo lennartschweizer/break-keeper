@@ -29,7 +29,7 @@
   <Applications>
     <Application
       Id="BreakKeeper"
-      Executable="BreakKeeper.App.exe"
+      Executable="BreakKeeper.exe"
       EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements
         DisplayName="Break Keeper"
