@@ -6,7 +6,7 @@ Set your focus and break durations and start a session. Two minutes before a bre
 
 ## Installation
 
-1. Download `BreakKeeper-v<version>-win-x64.zip` from the latest [Releases](https://github.com/lennartschweizer/break-keeper/releases).
+1. Download `BreakKeeper-v<version>-win-x64.zip` from the latest [release](https://github.com/lennartschweizer/break-keeper/releases/latest).
 2. Extract the archive to a folder of your choice.
 3. Run `BreakKeeper.App.exe`.
 
