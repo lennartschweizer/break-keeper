@@ -10,7 +10,7 @@ Set your focus and break durations and start a session. Two minutes before a bre
 2. Extract the archive to a folder of your choice.
 3. Run `BreakKeeper.App.exe`.
 
-> **Windows SmartScreen:** Because the portable release binary is currently unsigned, Windows Defender SmartScreen may show a warning on first launch. Click **More info** → **Run anyway**.
+> **Microsoft Defender SmartScreen:** Because the portable release binary is currently unsigned, Microsoft Defender SmartScreen may show a warning on first launch. Click **More info** → **Run anyway**.
 
 ## Build & Package From Source
 
