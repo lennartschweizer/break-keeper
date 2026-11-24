@@ -47,5 +47,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          $tag = "${{ github.ref_name }}"
+          $version = $tag.TrimStart('v')
+          $readme = Get-Content -Path "README.md" -Raw -Encoding utf8
+          if ($readme -notmatch '(?ms)^## Installation\r?\n(.*?)(?=\r?\n## |\z)') {
+            throw "Installation section not found in README.md"
+          }
+          $installBlock = $Matches[1].Trim().Replace('<version>', $version)
+          $notesPath = Join-Path $env:RUNNER_TEMP "release-notes.md"
+          [System.IO.File]::WriteAllText($notesPath, "### Installation`n`n$installBlock", [System.Text.UTF8Encoding]::new($false))
           $files = Get-ChildItem -Path "out/dist/*" -Include *.zip,*.sha256
-          gh release create "${{ github.ref_name }}" $files --generate-notes --verify-tag
+          gh release create $tag $files --notes-file $notesPath --generate-notes --verify-tag
